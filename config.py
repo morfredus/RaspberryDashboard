@@ -100,6 +100,16 @@ NETWORK_SERVICES = {
         "port": 80,
         "timeout": 1.0,            # secondes ; borne le temps d'attente si hors ligne
     },
+    "gatewaylab": {
+        "host": "gatewaylab.local",  # nom mDNS ou IP fixe de l'ESP32
+        "port": 80,
+        "timeout": 1.0,            # secondes ; borne le temps d'attente si hors ligne
+    },
+    "componenthub": {
+        "host": "componenthub.local",  # nom mDNS ou IP fixe de l'ESP32
+        "port": 80,
+        "timeout": 1.0,            # secondes ; borne le temps d'attente si hors ligne
+    },
 }
 
 # Délai de grâce avant la première sonde réseau (secondes d'uptime système).
