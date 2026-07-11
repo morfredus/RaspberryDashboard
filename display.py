@@ -32,7 +32,7 @@ from config import (
 # Colonnes d'alignement (px) pour la zone système
 DOT_X = 10          # pastille de santé
 LABEL_X = 24        # début du libellé (CPU / RAM / Swap / SSD)
-DETAIL_X = 128      # colonne secondaire (température, détail SSD)
+DETAIL_X = 148      # colonne secondaire (température, détail SSD)
 SERVICE_DOT_X = 150  # pastille d'état des services
 
 
@@ -84,7 +84,7 @@ class DashboardDisplay:
         """Pastille de santé + libellé/valeur alignés. Texte toujours blanc."""
         self._dot(draw, y, health_color(value, warning, critical))
         draw.text((LABEL_X, y),
-                  f"{label:<5}{value:>5.1f} %",
+                  f"{label:<5}{value:>5.1f}%",
                   fill="white",
                   font=self.font)
 
@@ -96,7 +96,7 @@ class DashboardDisplay:
         if info["temp"] is None:
             temp_txt, temp_col = "--", "gray"
         else:
-            temp_txt = f"{info['temp']:.1f} °C"
+            temp_txt = f"{info['temp']:.1f}°C"
             temp_col = health_color(info["temp"], TEMP_WARNING, TEMP_CRITICAL)
         draw.text((DETAIL_X, y), temp_txt, fill=temp_col, font=self.font)
 
@@ -108,7 +108,7 @@ class DashboardDisplay:
 
         y += 20
         self._metric(draw, y, "SSD", info["disk_percent"], SSD_WARNING, SSD_CRITICAL)
-        detail = f"{info['disk_used_gb']:.0f} / {info['disk_total_gb']:.0f} Gio"
+        detail = f"{info['disk_used_gb']:.0f}/{info['disk_total_gb']:.0f}Gio"
         draw.text((DETAIL_X, y), detail, fill="gray", font=self.font)
 
         draw.line((10, 122, WIDTH-10, 122), fill="gray")
@@ -134,7 +134,7 @@ class DashboardDisplay:
 
         self._dot(draw, y, health_color(load_pct, LOAD_WARNING, LOAD_CRITICAL))
         draw.text((LABEL_X, y),
-                  f"{'Load':<5}{la[0]:.2f} {la[1]:.2f} {la[2]:.2f} {load_pct:>3.0f} %",
+                  f"{'Load':<5}{la[0]:.2f} {la[1]:.2f} {la[2]:.2f} {load_pct:>3.0f}%",
                   fill="lightblue",
                   font=self.font)
 
