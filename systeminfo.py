@@ -5,6 +5,18 @@ from datetime import datetime
 
 import psutil
 
+from config import PROJECT_DIR
+
+
+def _read_version():
+    try:
+        return (PROJECT_DIR / "VERSION").read_text().strip() or "dev"
+    except Exception:
+        return "dev"
+
+
+VERSION = _read_version()
+
 
 def _get_ip(interface: str):
     try:
@@ -68,6 +80,8 @@ def get_system_info():
 
         "hostname": socket.gethostname(),
 
+        "version": VERSION,
+
         "time": datetime.now().strftime("%H:%M:%S"),
 
         "eth": _get_ip("eth0"),
@@ -84,9 +98,11 @@ def get_system_info():
 
         "swap_percent": psutil.swap_memory().percent,
 
-        "disk_percent": psutil.disk_usage("/").percent,
+        "disk_percent": round(disk.used / disk.total * 100, 1),
 
         "disk_free_gb": round(disk.free / (1024**3), 1),
+
+        "disk_total_gb": round(disk.total / (1024**3), 1),
 
         "uptime": _uptime(),
 

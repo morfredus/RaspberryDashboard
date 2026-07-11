@@ -7,7 +7,28 @@ Aucune dépendance au matériel : uniquement Pillow.
 
 from PIL import Image, ImageDraw, ImageFont
 
-from config import WIDTH, HEIGHT
+from config import (
+    WIDTH,
+    HEIGHT,
+    CPU_WARNING,
+    CPU_CRITICAL,
+    RAM_WARNING,
+    RAM_CRITICAL,
+    SWAP_WARNING,
+    SWAP_CRITICAL,
+    TEMP_WARNING,
+    TEMP_CRITICAL,
+    SSD_WARNING,
+    SSD_CRITICAL,
+    SERVICE_LABELS,
+    health_color,
+)
+
+# Colonnes d'alignement (px) pour la zone système
+DOT_X = 10          # pastille de santé
+LABEL_X = 24        # début du libellé (CPU / RAM / Swap / SSD)
+DETAIL_X = 112      # colonne secondaire (température, détail SSD)
+SERVICE_DOT_X = 150  # pastille d'état des services
 
 
 class DashboardDisplay:
@@ -15,6 +36,9 @@ class DashboardDisplay:
     def __init__(self):
         self.font = ImageFont.load_default()
         self.title_font = ImageFont.load_default()
+
+    def _dot(self, draw, y, color):
+        draw.ellipse((DOT_X, y + 3, DOT_X + 8, y + 11), fill=color)
 
     def render(self, info):
 
@@ -32,25 +56,43 @@ class DashboardDisplay:
     def _header(self, draw, info):
         draw.rectangle((0, 0, WIDTH, 26), fill="#0055A5")
         draw.text((6, 7), info["hostname"], fill="white", font=self.title_font)
+
+        version = f"v{info.get('version', 'dev')}"
+        vw = draw.textlength(version, font=self.title_font)
+        draw.text(((WIDTH - vw) / 2, 7), version, fill="#BBD6F2", font=self.title_font)
+
         draw.text((WIDTH - 58, 7), info["time"], fill="white", font=self.title_font)
+
+    def _metric(self, draw, y, label, value, warning, critical):
+        """Pastille de santé + libellé/valeur alignés. Texte toujours blanc."""
+        self._dot(draw, y, health_color(value, warning, critical))
+        draw.text((LABEL_X, y),
+                  f"{label:<5}{value:>5.1f} %",
+                  fill="white",
+                  font=self.font)
 
     def _system(self, draw, info):
         y = 38
-        draw.text((10, y),     f"CPU     {info['cpu']:>5.1f} %", fill="white", font=self.font)
-        temp = "--" if info["temp"] is None else f"{info['temp']:.1f} °C"
-        draw.text((140, y), temp, fill="orange", font=self.font)
+
+        # CPU + température (colonne secondaire)
+        self._metric(draw, y, "CPU", info["cpu"], CPU_WARNING, CPU_CRITICAL)
+        if info["temp"] is None:
+            temp_txt, temp_col = "--", "gray"
+        else:
+            temp_txt = f"{info['temp']:.1f} °C"
+            temp_col = health_color(info["temp"], TEMP_WARNING, TEMP_CRITICAL)
+        draw.text((DETAIL_X, y), temp_txt, fill=temp_col, font=self.font)
 
         y += 20
-        draw.text((10, y), f"RAM     {info['ram_percent']:>5.1f} %", fill="white", font=self.font)
+        self._metric(draw, y, "RAM", info["ram_percent"], RAM_WARNING, RAM_CRITICAL)
 
         y += 20
-        draw.text((10, y), f"Swap    {info['swap_percent']:>5.1f} %", fill="white", font=self.font)
+        self._metric(draw, y, "Swap", info["swap_percent"], SWAP_WARNING, SWAP_CRITICAL)
 
         y += 20
-        draw.text((10, y),
-                  f"SSD     {info['disk_percent']:>5.1f} %  ({info['disk_free_gb']:.0f} Go)",
-                  fill="white",
-                  font=self.font)
+        self._metric(draw, y, "SSD", info["disk_percent"], SSD_WARNING, SSD_CRITICAL)
+        detail = f"{info['disk_free_gb']:.0f} Gio / {info['disk_total_gb']:.0f} Gio"
+        draw.text((DETAIL_X, y), detail, fill="gray", font=self.font)
 
         draw.line((10, 122, WIDTH-10, 122), fill="gray")
 
@@ -80,10 +122,10 @@ class DashboardDisplay:
         y = 252
 
         for service, running in info["services"].items():
-            name = service.capitalize()
-            draw.text((10, y), f"{name:<13}", fill="white", font=self.font)
+            name = SERVICE_LABELS.get(service, service.capitalize())
+            draw.text((10, y), name, fill="white", font=self.font)
             color = "lime" if running else "red"
-            draw.ellipse((170, y+2, 178, y+10), fill=color)
+            draw.ellipse((SERVICE_DOT_X, y+2, SERVICE_DOT_X+8, y+10), fill=color)
             y += 18
 
 
