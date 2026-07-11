@@ -17,6 +17,14 @@ HEIGHT = 320
 
 UPDATE_INTERVAL = 2
 
+# Pilote d'écran : "ili9341" ou "st7789".
+DISPLAY_DRIVER = "ili9341"
+
+# Décalage de la dalle ST7789 (0 pour un panneau 240 × 320 plein cadre ;
+# certaines dalles 240 × 240 demandent un offset, ex. Y = 80).
+ST7789_X_OFFSET = 0
+ST7789_Y_OFFSET = 0
+
 # ---------------------------------------------------------------------
 # GPIO
 # ---------------------------------------------------------------------
@@ -97,16 +105,6 @@ SERVICE_LABELS = {
 NETWORK_SERVICES = {
     "meteohub": {
         "host": "meteohub.local",  # nom mDNS ou IP fixe de l'ESP32
-        "port": 80,
-        "timeout": 1.0,            # secondes ; borne le temps d'attente si hors ligne
-    },
-    "gatewaylab": {
-        "host": "gatewaylab.local",  # nom mDNS ou IP fixe de l'ESP32
-        "port": 80,
-        "timeout": 1.0,            # secondes ; borne le temps d'attente si hors ligne
-    },
-    "componenthub": {
-        "host": "componenthub.local",  # nom mDNS ou IP fixe de l'ESP32
         "port": 80,
         "timeout": 1.0,            # secondes ; borne le temps d'attente si hors ligne
     },

@@ -1,7 +1,7 @@
 # RaspberryDashboard
 
 Tableau de bord système pour Raspberry Pi, affiché sur un petit écran
-**ILI9341 SPI (240 × 320)**. Il donne, en un coup d'œil, l'état de santé de
+**ILI9341 ou ST7789 SPI (240 × 320)**. Il donne, en un coup d'œil, l'état de santé de
 la machine : CPU, mémoire, disque, charge, réseau et services.
 
 L'objectif : connaître l'état du Raspberry en moins d'une seconde, sans clavier

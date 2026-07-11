@@ -7,8 +7,13 @@
 
 ## Écran
 
--   ILI9341 SPI
+-   ILI9341 **ou** ST7789 SPI
 -   240 × 320 pixels
+
+Le pilote est sélectionné par `DISPLAY_DRIVER` dans `config.py`
+(`"ili9341"` ou `"st7789"`). Le brochage, le bus SPI et la vitesse sont
+communs aux deux écrans. Les dalles ST7789 240 × 240 peuvent nécessiter un
+décalage (`ST7789_X_OFFSET` / `ST7789_Y_OFFSET`).
 
 ## Brochage
 

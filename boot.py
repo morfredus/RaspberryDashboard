@@ -63,7 +63,7 @@ class BootScreen:
 
 if __name__ == "__main__":
 
-    from ili9341 import Display
+    from screen import Display
 
     lcd = Display()
 

@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## v1.1.0
+
+### Matériel
+
+-   Prise en charge de l'écran **ST7789** (240 × 320 SPI) en plus de
+    l'ILI9341. Le pilote est choisi via `DISPLAY_DRIVER` dans `config.py`
+    (`"ili9341"` ou `"st7789"`).
+-   Nouveau pilote `st7789.py` exposant la même API `Display`.
+-   Nouveau module `screen.py` : sélectionne le pilote selon la
+    configuration ; `dashboard.py` et `boot.py` importent `Display` depuis
+    ce module (plus de dépendance directe à un pilote).
+-   Décalages de dalle `ST7789_X_OFFSET` / `ST7789_Y_OFFSET` dans
+    `config.py` pour les panneaux nécessitant un offset.
+
 ## v1.0.1
 
 ### Corrections

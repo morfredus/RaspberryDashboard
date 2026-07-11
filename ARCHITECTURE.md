@@ -8,7 +8,9 @@
     ├── dashboard.py
     ├── dashboard.service
     ├── display.py
+    ├── screen.py
     ├── ili9341.py
+    ├── st7789.py
     ├── systeminfo.py
     ├── README.md
     ├── INSTALL.md
@@ -23,5 +25,7 @@
 -   `boot.py` : animation de démarrage.
 -   `display.py` : composition de l'interface.
 -   `systeminfo.py` : collecte des informations système.
--   `ili9341.py` : pilote matériel.
+-   `screen.py` : sélection du pilote d'écran selon `config.py`.
+-   `ili9341.py` : pilote matériel ILI9341.
+-   `st7789.py` : pilote matériel ST7789.
 -   `config.py` : paramètres et seuils.

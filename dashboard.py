@@ -8,7 +8,7 @@ import time
 
 from boot import BootScreen
 from display import DashboardDisplay
-from ili9341 import Display
+from screen import Display
 from systeminfo import get_system_info
 from config import UPDATE_INTERVAL
 
