@@ -5,11 +5,14 @@ Gestion de l'affichage du Dashboard.
 Aucune dépendance au matériel : uniquement Pillow.
 """
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 from config import (
     WIDTH,
     HEIGHT,
+    FONT_SIZE,
+    TITLE_FONT_SIZE,
+    load_font,
     CPU_WARNING,
     CPU_CRITICAL,
     RAM_WARNING,
@@ -29,15 +32,15 @@ from config import (
 # Colonnes d'alignement (px) pour la zone système
 DOT_X = 10          # pastille de santé
 LABEL_X = 24        # début du libellé (CPU / RAM / Swap / SSD)
-DETAIL_X = 112      # colonne secondaire (température, détail SSD)
+DETAIL_X = 128      # colonne secondaire (température, détail SSD)
 SERVICE_DOT_X = 150  # pastille d'état des services
 
 
 class DashboardDisplay:
 
     def __init__(self):
-        self.font = ImageFont.load_default()
-        self.title_font = ImageFont.load_default()
+        self.font = load_font(FONT_SIZE)
+        self.title_font = load_font(TITLE_FONT_SIZE, bold=True)
 
     def _dot(self, draw, y, color):
         draw.ellipse((DOT_X, y + 3, DOT_X + 8, y + 11), fill=color)
@@ -57,13 +60,25 @@ class DashboardDisplay:
 
     def _header(self, draw, info):
         draw.rectangle((0, 0, WIDTH, 26), fill="#0055A5")
-        draw.text((6, 7), info["hostname"], fill="white", font=self.title_font)
 
+        # Nom d'hôte à gauche
+        host = info["hostname"]
+        draw.text((6, 7), host, fill="white", font=self.title_font)
+        host_right = 6 + draw.textlength(host, font=self.title_font)
+
+        # Heure à droite
+        time_txt = info["time"]
+        tw = draw.textlength(time_txt, font=self.title_font)
+        time_left = WIDTH - 6 - tw
+        draw.text((time_left, 7), time_txt, fill="white", font=self.title_font)
+
+        # Version centrée : affichée seulement si elle tient sans chevaucher
+        # (un nom d'hôte long a priorité sur l'affichage de la version).
         version = f"v{info.get('version', 'dev')}"
         vw = draw.textlength(version, font=self.title_font)
-        draw.text(((WIDTH - vw) / 2, 7), version, fill="#BBD6F2", font=self.title_font)
-
-        draw.text((WIDTH - 58, 7), info["time"], fill="white", font=self.title_font)
+        vx = (WIDTH - vw) / 2
+        if vx > host_right + 6 and vx + vw < time_left - 6:
+            draw.text((vx, 7), version, fill="#BBD6F2", font=self.title_font)
 
     def _metric(self, draw, y, label, value, warning, critical):
         """Pastille de santé + libellé/valeur alignés. Texte toujours blanc."""
@@ -119,7 +134,7 @@ class DashboardDisplay:
 
         self._dot(draw, y, health_color(load_pct, LOAD_WARNING, LOAD_CRITICAL))
         draw.text((LABEL_X, y),
-                  f"{'Load':<5}{la[0]:.2f} {la[1]:.2f} {la[2]:.2f}  {load_pct:>3.0f} %",
+                  f"{'Load':<5}{la[0]:.2f} {la[1]:.2f} {la[2]:.2f} {load_pct:>3.0f} %",
                   fill="lightblue",
                   font=self.font)
 

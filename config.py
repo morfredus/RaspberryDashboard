@@ -7,6 +7,30 @@ from pathlib import Path
 PROJECT_DIR = Path(__file__).resolve().parent
 ASSETS_DIR = PROJECT_DIR / "assets"
 LOGO_FILE = ASSETS_DIR / "logo.png"
+FONTS_DIR = ASSETS_DIR / "fonts"
+
+# ---------------------------------------------------------------------
+# Polices
+# ---------------------------------------------------------------------
+# DejaVu Sans Mono : police monospace nette, fournie dans le dépôt pour un
+# rendu identique quel que soit l'OS. Le monospace garde les colonnes
+# alignées (libellés/valeurs). Repli sur la police PIL par défaut si absente.
+
+FONT_REGULAR = FONTS_DIR / "DejaVuSansMono.ttf"
+FONT_BOLD = FONTS_DIR / "DejaVuSansMono-Bold.ttf"
+
+FONT_SIZE = 14        # texte courant
+TITLE_FONT_SIZE = 12  # bandeau supérieur (en gras)
+
+
+def load_font(size=FONT_SIZE, bold=False):
+    """Charge une police TrueType du dépôt ; repli sur la police par défaut."""
+    from PIL import ImageFont
+    path = FONT_BOLD if bold else FONT_REGULAR
+    try:
+        return ImageFont.truetype(str(path), size)
+    except Exception:
+        return ImageFont.load_default()
 
 # ---------------------------------------------------------------------
 # Affichage

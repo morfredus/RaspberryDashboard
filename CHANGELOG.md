@@ -14,6 +14,18 @@
 -   Décalages de dalle `ST7789_X_OFFSET` / `ST7789_Y_OFFSET` dans
     `config.py` pour les panneaux nécessitant un offset.
 
+### Interface
+
+-   Police **DejaVu Sans Mono** (fournie dans `assets/fonts/`) à la place
+    de la police bitmap PIL par défaut : texte net et anti-crénelé sur les
+    deux écrans, colonnes parfaitement alignées.
+-   Tailles de police centralisées dans `config.py` (`FONT_SIZE`,
+    `TITLE_FONT_SIZE`) via l'aide `load_font()` (repli automatique sur la
+    police par défaut si le fichier est absent).
+-   Bandeau supérieur robuste : nom d'hôte et heure alignés dynamiquement ;
+    la version centrée s'efface si le nom d'hôte est trop long (plus de
+    chevauchement).
+
 ## v1.0.1
 
 ### Corrections

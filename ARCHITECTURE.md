@@ -2,6 +2,8 @@
 
     RaspberryDashboard/
     ├── assets/
+    │   ├── fonts/            (DejaVu Sans Mono)
+    │   └── logo.png
     ├── VERSION
     ├── boot.py
     ├── config.py
@@ -17,7 +19,8 @@
     ├── CHANGELOG.md
     ├── ROADMAP.md
     ├── ARCHITECTURE.md
-    └── HARDWARE.md
+    ├── HARDWARE.md
+    └── CABLAGE.md
 
 ## Modules
 

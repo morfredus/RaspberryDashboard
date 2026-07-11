@@ -6,15 +6,15 @@ Animation de démarrage du Dashboard Raspberry.
 
 import time
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
-from config import WIDTH, HEIGHT, LOGO_FILE
+from config import WIDTH, HEIGHT, LOGO_FILE, load_font
 
 
 class BootScreen:
 
     def __init__(self):
-        self.font = ImageFont.load_default()
+        self.font = load_font()
 
     def _frame(self, percent: int):
 
