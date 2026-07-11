@@ -90,6 +90,8 @@ def get_system_info():
 
         "cpu": psutil.cpu_percent(),
 
+        "cpu_cores": psutil.cpu_count() or 1,
+
         "load": psutil.getloadavg(),
 
         "temp": _cpu_temp(),
@@ -99,6 +101,8 @@ def get_system_info():
         "swap_percent": psutil.swap_memory().percent,
 
         "disk_percent": round(disk.used / disk.total * 100, 1),
+
+        "disk_used_gb": round(disk.used / (1024**3), 1),
 
         "disk_free_gb": round(disk.free / (1024**3), 1),
 

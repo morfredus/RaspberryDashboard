@@ -65,6 +65,10 @@ TEMP_CRITICAL = 75
 SSD_WARNING = 85
 SSD_CRITICAL = 95
 
+# Charge système, en % des cœurs (100 % = tous les cœurs pleinement occupés)
+LOAD_WARNING = 100
+LOAD_CRITICAL = 150
+
 
 def health_color(value, warning, critical):
     """Retourne la couleur de la pastille selon la valeur et ses seuils."""

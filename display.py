@@ -20,6 +20,8 @@ from config import (
     TEMP_CRITICAL,
     SSD_WARNING,
     SSD_CRITICAL,
+    LOAD_WARNING,
+    LOAD_CRITICAL,
     SERVICE_LABELS,
     health_color,
 )
@@ -91,7 +93,7 @@ class DashboardDisplay:
 
         y += 20
         self._metric(draw, y, "SSD", info["disk_percent"], SSD_WARNING, SSD_CRITICAL)
-        detail = f"{info['disk_free_gb']:.0f} Gio / {info['disk_total_gb']:.0f} Gio"
+        detail = f"{info['disk_used_gb']:.0f} / {info['disk_total_gb']:.0f} Gio"
         draw.text((DETAIL_X, y), detail, fill="gray", font=self.font)
 
         draw.line((10, 122, WIDTH-10, 122), fill="gray")
@@ -109,10 +111,15 @@ class DashboardDisplay:
     def _runtime(self, draw, info):
         y = 198
         draw.text((10, y), f"Uptime {info['uptime']}", fill="lightgreen", font=self.font)
+
         y += 18
         la = info["load"]
-        draw.text((10, y),
-                  f"Load   {la[0]:.2f} {la[1]:.2f} {la[2]:.2f}",
+        cores = info.get("cpu_cores", 1) or 1
+        load_pct = la[0] / cores * 100  # charge 1 min rapportée au nb de cœurs
+
+        self._dot(draw, y, health_color(load_pct, LOAD_WARNING, LOAD_CRITICAL))
+        draw.text((LABEL_X, y),
+                  f"{'Load':<5}{la[0]:.2f} {la[1]:.2f} {la[2]:.2f}  {load_pct:>3.0f} %",
                   fill="lightblue",
                   font=self.font)
 
