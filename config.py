@@ -23,6 +23,8 @@ UPDATE_INTERVAL = 2
 
 DC_PIN = 24
 RST_PIN = 25
+# CS = CE0 (GPIO 8) : géré en MATÉRIEL par le driver SPI (spidev, device 0).
+# Ne pas le piloter via RPi.GPIO sous Bookworm/lgpio -> « GPIO not allocated ».
 CS_PIN = 8
 LED_PIN = 18
 

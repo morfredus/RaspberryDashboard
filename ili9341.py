@@ -15,7 +15,6 @@ import time
 from config import (
     DC_PIN,
     RST_PIN,
-    CS_PIN,
     LED_PIN,
     WIDTH,
     HEIGHT,
@@ -32,9 +31,11 @@ class ILI9341:
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
 
+        # Le CS (CE0 / GPIO 8) est géré en matériel par le driver SPI.
+        # Ne pas le revendiquer ici : le noyau (spidev) le possède déjà,
+        # sinon lgpio lève « GPIO not allocated » sur Bookworm.
         GPIO.setup(DC_PIN, GPIO.OUT)
         GPIO.setup(RST_PIN, GPIO.OUT)
-        GPIO.setup(CS_PIN, GPIO.OUT)
 
         GPIO.setup(LED_PIN, GPIO.OUT)
         GPIO.output(LED_PIN, GPIO.LOW)
@@ -48,21 +49,17 @@ class ILI9341:
         self.init_display()
 
     def write_cmd(self, cmd):
+        # CS est abaissé/relevé automatiquement par le matériel SPI (CE0).
         GPIO.output(DC_PIN, GPIO.LOW)
-        GPIO.output(CS_PIN, GPIO.LOW)
         self.spi.writebytes([cmd])
-        GPIO.output(CS_PIN, GPIO.HIGH)
 
     def write_data(self, data):
         GPIO.output(DC_PIN, GPIO.HIGH)
-        GPIO.output(CS_PIN, GPIO.LOW)
 
         if isinstance(data, list):
             self.spi.writebytes(data)
         else:
             self.spi.writebytes([data])
-
-        GPIO.output(CS_PIN, GPIO.HIGH)
 
     def reset(self):
         GPIO.output(RST_PIN, GPIO.HIGH)
@@ -111,7 +108,6 @@ class ILI9341:
         self.write_cmd(0x2C)
 
         GPIO.output(DC_PIN, GPIO.HIGH)
-        GPIO.output(CS_PIN, GPIO.LOW)
 
         b, g, r = img.split()
 
@@ -126,7 +122,6 @@ class ILI9341:
         buf[:, :, 1] = rgb565 & 0xFF
 
         self.spi.writebytes2(buf.tobytes())
-        GPIO.output(CS_PIN, GPIO.HIGH)
 
     def clear(self, color="black"):
         self.display_image(Image.new("RGB", (WIDTH, HEIGHT), color))
