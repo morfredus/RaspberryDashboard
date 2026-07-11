@@ -1,13 +1,13 @@
 [Unit]
-Description=Dashboard Raspberry
-After=network-online.target
+Description=Raspberry Dashboard
+After=multi-user.target network-online.target
 Wants=network-online.target
 
 [Service]
 Type=simple
 User=morfredus
-WorkingDirectory=/home/morfredus/Codage/Python/DashboardRaspberry
-ExecStart=/usr/bin/python3 /home/morfredus/Codage/Python/DashboardRaspberry/dashboard.py
+WorkingDirectory=/home/morfredus/Codage/Python/RaspberryDashboard
+ExecStart=/usr/bin/python3 /home/morfredus/Codage/Python/RaspberryDashboard/dashboard.py
 Restart=always
 RestartSec=5
 
