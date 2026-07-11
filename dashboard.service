@@ -1,0 +1,18 @@
+[Unit]
+Description=Dashboard Raspberry
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=morfredus
+WorkingDirectory=/home/morfredus/Codage/Python/DashboardRaspberry
+ExecStart=/usr/bin/python3 /home/morfredus/Codage/Python/DashboardRaspberry/dashboard.py
+Restart=always
+RestartSec=5
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
