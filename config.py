@@ -86,7 +86,7 @@ def health_color(value, warning, critical):
 # ---------------------------------------------------------------------
 
 SERVICE_LABELS = {
+    "dashboard": "DashBoard",
     "gatewaylab": "GatewayLab",
-    "componenthub": "ComponentHub",
     "meteohub": "MeteoHub",
 }
