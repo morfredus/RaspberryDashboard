@@ -23,6 +23,8 @@ from config import (
     SPI_SPEED,
     ST7789_X_OFFSET,
     ST7789_Y_OFFSET,
+    ST7789_MADCTL,
+    ST7789_INVERT,
 )
 
 
@@ -79,7 +81,7 @@ class ST7789:
 
         seq = [
             (0x3A, [0x55]),                               # COLMOD  : 16 bits/pixel (RGB565)
-            (0x36, [0x00]),                               # MADCTL  : ordre RGB, portrait
+            (0x36, [ST7789_MADCTL]),                      # MADCTL  : orientation / miroir / ordre couleur
             (0xB2, [0x0C, 0x0C, 0x00, 0x33, 0x33]),       # PORCTRL : porches
             (0xB7, [0x35]),                               # GCTRL
             (0xBB, [0x19]),                               # VCOMS
@@ -101,7 +103,7 @@ class ST7789:
             self.write_cmd(cmd)
             self.write_data(data)
 
-        self.write_cmd(0x21)      # INVON : inversion requise pour des couleurs correctes
+        self.write_cmd(0x21 if ST7789_INVERT else 0x20)  # INVON / INVOFF selon le panneau
         self.write_cmd(0x13)      # NORON : mode d'affichage normal
         time.sleep(0.01)
         self.write_cmd(0x29)      # DISPON : allumage de la dalle

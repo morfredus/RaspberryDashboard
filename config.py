@@ -42,12 +42,25 @@ HEIGHT = 320
 UPDATE_INTERVAL = 2
 
 # Pilote d'écran : "ili9341" ou "st7789".
-DISPLAY_DRIVER = "ili9341"
+DISPLAY_DRIVER = "st7789"
 
 # Décalage de la dalle ST7789 (0 pour un panneau 240 × 320 plein cadre ;
 # certaines dalles 240 × 240 demandent un offset, ex. Y = 80).
 ST7789_X_OFFSET = 0
 ST7789_Y_OFFSET = 0
+
+# Orientation ST7789 (registre MADCTL 0x36). Les panneaux diffèrent : si
+# l'image est tête-bêche et/ou en miroir, essayer une de ces valeurs.
+#   0x00  portrait
+#   0xC0  portrait à 180° (tête-bêche)   ← essai n°1 si tête-bêche
+#   0x80  miroir vertical (MY)
+#   0x40  miroir horizontal (MX)
+# Ajouter 0x08 (bit BGR) si le rouge et le bleu sont intervertis, ex. 0xC8.
+ST7789_MADCTL = 0x00
+
+# Inversion d'affichage ST7789. True = INVON (0x21), False = INVOFF (0x20).
+# Si les couleurs sortent « en négatif », basculer cette valeur.
+ST7789_INVERT = True
 
 # ---------------------------------------------------------------------
 # GPIO

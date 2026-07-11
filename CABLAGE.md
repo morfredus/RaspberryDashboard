@@ -132,5 +132,9 @@ Sérigraphie typique (bord du module) :
    (cycle navy → vert foncé → noir sur l'écran).
 4. Si l'image ST7789 est décalée (dalle 240×240), ajuster
    `ST7789_X_OFFSET` / `ST7789_Y_OFFSET` dans `config.py`.
-5. Si les couleurs du ST7789 sont inversées, remplacer `0x21` (INVON) par
-   `0x20` (INVOFF) dans `init_display()` de `st7789.py`.
+5. Réglages d'orientation / couleurs ST7789, dans `config.py` :
+   - **Tête-bêche / miroir** → `ST7789_MADCTL` (registre 0x36) :
+     `0x00` portrait · `0xC0` 180° · `0x80` miroir vertical ·
+     `0x40` miroir horizontal. Ajouter `0x08` si rouge/bleu intervertis.
+   - **Couleurs en négatif** → basculer `ST7789_INVERT` (True = INVON,
+     False = INVOFF).
