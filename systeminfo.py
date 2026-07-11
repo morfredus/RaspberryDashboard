@@ -5,7 +5,12 @@ from datetime import datetime
 
 import psutil
 
-from config import PROJECT_DIR, SERVICE_LABELS, NETWORK_SERVICES
+from config import (
+    PROJECT_DIR,
+    SERVICE_LABELS,
+    NETWORK_SERVICES,
+    NETWORK_PROBE_GRACE,
+)
 
 
 def _read_version():
@@ -42,6 +47,15 @@ def _cpu_temp():
             return round(float(f.read()) / 1000, 1)
     except Exception:
         return None
+
+
+def _uptime_seconds():
+    """Uptime système en secondes. Fail-open (grand nombre) si illisible."""
+    try:
+        with open("/proc/uptime") as f:
+            return float(f.readline().split()[0])
+    except Exception:
+        return float("inf")
 
 
 def _uptime():
@@ -84,9 +98,19 @@ def _network_service_online(config: dict):
         return False
 
 
-def _service_state(name: str):
-    """État d'un service : sonde réseau si déclaré, sinon systemd."""
+def _service_state(name: str, network_ready: bool = True):
+    """État d'un service : sonde réseau si déclaré, sinon systemd.
+
+    La sonde réseau résout un nom mDNS (« .local »), ce qui émet des
+    requêtes multicast sur wlan0. On ne sonde que lorsque le réseau est
+    « prêt » : une IP est présente ET l'uptime dépasse le délai de grâce.
+    Cela évite de perturber la connexion WiFi pendant qu'elle s'établit
+    au démarrage (au prix d'une puce MeteoHub qui verdit avec un léger
+    délai après le boot).
+    """
     if name in NETWORK_SERVICES:
+        if not network_ready:
+            return False
         return _network_service_online(NETWORK_SERVICES[name])
     return _service_running(name)
 
@@ -94,6 +118,13 @@ def _service_state(name: str):
 def get_system_info():
 
     disk = shutil.disk_usage("/")
+
+    # Résolues une seule fois : servent aussi de feu vert à la sonde réseau.
+    # On ne sonde (mDNS) que si une IP est présente ET que le système est
+    # démarré depuis assez longtemps pour ne pas gêner l'association WiFi.
+    eth = _get_ip("eth0")
+    wifi = _get_ip("wlan0")
+    network_ready = bool(eth or wifi) and _uptime_seconds() >= NETWORK_PROBE_GRACE
 
     return {
 
@@ -103,9 +134,9 @@ def get_system_info():
 
         "time": datetime.now().strftime("%H:%M:%S"),
 
-        "eth": _get_ip("eth0"),
+        "eth": eth,
 
-        "wifi": _get_ip("wlan0"),
+        "wifi": wifi,
 
         "cpu": psutil.cpu_percent(),
 
@@ -130,7 +161,7 @@ def get_system_info():
         "uptime": _uptime(),
 
         "services": {
-            name: _service_state(name)
+            name: _service_state(name, network_ready)
             for name in SERVICE_LABELS
         }
     }

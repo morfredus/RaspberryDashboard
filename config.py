@@ -101,3 +101,9 @@ NETWORK_SERVICES = {
         "timeout": 1.0,            # secondes ; borne le temps d'attente si hors ligne
     },
 }
+
+# Délai de grâce avant la première sonde réseau (secondes d'uptime système).
+# La sonde résout un nom mDNS (requêtes multicast sur wlan0) : on attend que
+# le WiFi soit associé et stabilisé pour ne pas perturber sa connexion au
+# démarrage. La puce MeteoHub reste rouge tant que ce délai n'est pas écoulé.
+NETWORK_PROBE_GRACE = 45

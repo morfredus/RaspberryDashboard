@@ -1,6 +1,6 @@
 [Unit]
-Description=Raspberry Dashboard
-After=multi-user.target
+Description=RaspberryDashboard
+After=local-fs.target
 
 [Service]
 Type=simple
