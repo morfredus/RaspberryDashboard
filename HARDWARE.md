@@ -25,4 +25,8 @@
 -   Device : 0
 -   Vitesse : 40 MHz
 
+Le CS (GPIO 8 / CE0) est piloté **automatiquement par le contrôleur SPI**,
+sans gestion logicielle via `RPi.GPIO`. Le revendiquer manuellement provoque
+l'erreur « GPIO not allocated » sous `lgpio`.
+
 Les paramètres matériels sont centralisés dans `config.py`.

@@ -5,7 +5,7 @@ from datetime import datetime
 
 import psutil
 
-from config import PROJECT_DIR
+from config import PROJECT_DIR, SERVICE_LABELS
 
 
 def _read_version():
@@ -111,9 +111,8 @@ def get_system_info():
         "uptime": _uptime(),
 
         "services": {
-            "dashboard": _service_running("dashboard"),
-            "gatewaylab": _service_running("gatewaylab"),
-            "componenthub": _service_running("componenthub"),
+            name: _service_running(name)
+            for name in SERVICE_LABELS
         }
     }
 

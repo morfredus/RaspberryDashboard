@@ -10,6 +10,7 @@
     ├── display.py
     ├── ili9341.py
     ├── systeminfo.py
+    ├── README.md
     ├── INSTALL.md
     ├── CHANGELOG.md
     ├── ROADMAP.md
