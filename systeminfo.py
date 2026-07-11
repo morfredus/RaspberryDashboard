@@ -5,7 +5,7 @@ from datetime import datetime
 
 import psutil
 
-from config import PROJECT_DIR, SERVICE_LABELS
+from config import PROJECT_DIR, SERVICE_LABELS, NETWORK_SERVICES
 
 
 def _read_version():
@@ -72,6 +72,25 @@ def _service_running(service: str):
         return False
 
 
+def _network_service_online(config: dict):
+    """Vrai si une connexion TCP aboutit (ex. serveur web de l'ESP32)."""
+    try:
+        with socket.create_connection(
+            (config["host"], config["port"]),
+            timeout=config.get("timeout", 1.0),
+        ):
+            return True
+    except OSError:
+        return False
+
+
+def _service_state(name: str):
+    """État d'un service : sonde réseau si déclaré, sinon systemd."""
+    if name in NETWORK_SERVICES:
+        return _network_service_online(NETWORK_SERVICES[name])
+    return _service_running(name)
+
+
 def get_system_info():
 
     disk = shutil.disk_usage("/")
@@ -111,7 +130,7 @@ def get_system_info():
         "uptime": _uptime(),
 
         "services": {
-            name: _service_running(name)
+            name: _service_state(name)
             for name in SERVICE_LABELS
         }
     }

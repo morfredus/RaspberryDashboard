@@ -82,11 +82,22 @@ def health_color(value, warning, critical):
 
 
 # ---------------------------------------------------------------------
-# Libellés d'affichage des services (clé systemd -> nom lisible)
+# Libellés d'affichage des services (clé -> nom lisible)
 # ---------------------------------------------------------------------
 
 SERVICE_LABELS = {
-    "dashboard": "DashBoard",
     "gatewaylab": "GatewayLab",
+    "componenthub": "ComponentHub",
     "meteohub": "MeteoHub",
+}
+
+# Services surveillés par sonde réseau plutôt que par systemd.
+# MeteoHub tourne sur un ESP32 : on ne peut pas l'interroger avec
+# « systemctl », on teste donc l'accès à son serveur web.
+NETWORK_SERVICES = {
+    "meteohub": {
+        "host": "meteohub.local",  # nom mDNS ou IP fixe de l'ESP32
+        "port": 80,
+        "timeout": 1.0,            # secondes ; borne le temps d'attente si hors ligne
+    },
 }
