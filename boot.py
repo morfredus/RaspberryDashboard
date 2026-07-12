@@ -8,7 +8,7 @@ import time
 
 from PIL import Image, ImageDraw
 
-from config import WIDTH, HEIGHT, LOGO_FILE, load_font
+from config import WIDTH, HEIGHT, LOGO_FILE, FONT_ANTIALIAS, load_font
 
 
 class BootScreen:
@@ -20,6 +20,7 @@ class BootScreen:
 
         img = Image.new("RGB", (WIDTH, HEIGHT), "black")
         draw = ImageDraw.Draw(img)
+        draw.fontmode = "L" if FONT_ANTIALIAS else "1"
 
         # Logo
         try:

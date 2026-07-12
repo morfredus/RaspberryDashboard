@@ -12,6 +12,8 @@ from config import (
     HEIGHT,
     FONT_SIZE,
     TITLE_FONT_SIZE,
+    FONT_ANTIALIAS,
+    FONT_BODY_BOLD,
     load_font,
     CPU_WARNING,
     CPU_CRITICAL,
@@ -39,7 +41,7 @@ SERVICE_DOT_X = 150  # pastille d'état des services
 class DashboardDisplay:
 
     def __init__(self):
-        self.font = load_font(FONT_SIZE)
+        self.font = load_font(FONT_SIZE, bold=FONT_BODY_BOLD)
         self.title_font = load_font(TITLE_FONT_SIZE, bold=True)
 
     def _dot(self, draw, y, color):
@@ -49,6 +51,7 @@ class DashboardDisplay:
 
         img = Image.new("RGB", (WIDTH, HEIGHT), "black")
         draw = ImageDraw.Draw(img)
+        draw.fontmode = "L" if FONT_ANTIALIAS else "1"
 
         self._header(draw, info)
         self._system(draw, info)

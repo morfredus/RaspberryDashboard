@@ -22,6 +22,10 @@ FONT_BOLD = FONTS_DIR / "DejaVuSansMono-Bold.ttf"
 FONT_SIZE = 14        # texte courant
 TITLE_FONT_SIZE = 12  # bandeau supérieur (en gras)
 
+# Rendu du texte — à juger sur l'écran réel.
+FONT_ANTIALIAS = True  # False = bords nets sans lissage (parfois plus lisible en petit)
+FONT_BODY_BOLD = False  # True = texte courant en gras (souvent plus lisible sur petit LCD)
+
 
 def load_font(size=FONT_SIZE, bold=False):
     """Charge une police TrueType du dépôt ; repli sur la police par défaut."""
