@@ -23,8 +23,8 @@ FONT_SIZE = 14        # texte courant
 TITLE_FONT_SIZE = 12  # bandeau supérieur (en gras)
 
 # Rendu du texte — à juger sur l'écran réel.
-FONT_ANTIALIAS = True  # False = bords nets sans lissage (parfois plus lisible en petit)
-FONT_BODY_BOLD = False  # True = texte courant en gras (souvent plus lisible sur petit LCD)
+FONT_ANTIALIAS = False  # False = bords nets sans lissage (parfois plus lisible en petit)
+FONT_BODY_BOLD = True  # True = texte courant en gras (souvent plus lisible sur petit LCD)
 
 
 def load_font(size=FONT_SIZE, bold=False):
@@ -144,6 +144,16 @@ SERVICE_LABELS = {
 # MeteoHub tourne sur un ESP32 : on ne peut pas l'interroger avec
 # « systemctl », on teste donc l'accès à son serveur web.
 NETWORK_SERVICES = {
+    "gatewaylab": {
+        "host": "gatewaylab.local",  # nom mDNS ou IP fixe de l'ESP32
+        "port": 80,
+        "timeout": 1.0,            # secondes ; borne le temps d'attente si hors ligne
+    },
+    "componenthub": {
+        "host": "componenthub.local",  # nom mDNS ou IP fixe de l'ESP32
+        "port": 80,
+        "timeout": 1.0,            # secondes ; borne le temps d'attente si hors ligne
+    },
     "meteohub": {
         "host": "meteohub.local",  # nom mDNS ou IP fixe de l'ESP32
         "port": 80,
