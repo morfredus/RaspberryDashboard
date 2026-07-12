@@ -129,6 +129,7 @@ class DashboardDisplay:
     def _runtime(self, draw, info):
         y = 198
         draw.text((10, y), f"Uptime {info['uptime']}", fill="lightgreen", font=self.font)
+        self._reboot_badge(draw, y, info.get("reboot_alert", {}))
 
         y += 18
         la = info["load"]
@@ -142,6 +143,20 @@ class DashboardDisplay:
                   font=self.font)
 
         draw.line((10, 242, WIDTH-10, 242), fill="gray")
+
+    def _reboot_badge(self, draw, y, alert):
+        if not alert.get("active"):
+            return
+
+        count = alert.get("count", 1)
+        txt = "REBOOT!" if count <= 1 else f"REBOOT x{count}"
+        pad_x = 4
+        badge_h = 15
+        tw = draw.textlength(txt, font=self.title_font)
+        x0 = WIDTH - 10 - int(tw) - pad_x * 2
+        y0 = y - 1
+        draw.rectangle((x0, y0, WIDTH - 10, y0 + badge_h), fill="#C62828")
+        draw.text((x0 + pad_x, y0 + 3), txt, fill="white", font=self.title_font)
 
     def _services(self, draw, info):
         y = 252

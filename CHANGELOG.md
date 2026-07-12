@@ -25,6 +25,17 @@
 -   Bandeau supérieur robuste : nom d'hôte et heure alignés dynamiquement ;
     la version centrée s'efface si le nom d'hôte est trop long (plus de
     chevauchement).
+-   Badge `REBOOT!` sur la ligne `Uptime` lorsqu'un rapport `Boot_*` récent
+    indique un reboot non demandé lié au démarrage courant.
+
+### Exploitation
+
+-   Nouveau module `reboot_alert.py` pour détecter les rapports de reboot dans
+    le dossier de logs configuré et ignorer l'historique ancien.
+-   Nouveau script `reboot_ack.py` pour acquitter le badge `REBOOT!` sans
+    supprimer les logs.
+-   Documentation du lanceur `~/bin/reboot-ack` pour appeler l'acquittement
+    depuis n'importe quel dossier.
 
 ## v1.0.1
 

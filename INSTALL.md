@@ -17,6 +17,10 @@ Raspberry Pi.
 /home/morfredus/Codage/Python/RaspberryDashboard
 ```
 
+Les chemins contenant `/home/morfredus` sont propres à cette installation.
+Pour un autre utilisateur, remplacer `morfredus` par le nom du compte Linux
+concerné.
+
 ## Vérifier le fonctionnement
 
 ``` bash
@@ -71,6 +75,54 @@ Désactiver le démarrage automatique :
 
 ``` bash
 sudo systemctl disable dashboard
+```
+
+## Commande d'acquittement du badge reboot
+
+Le script `reboot_ack.py` permet d'acquitter le badge `REBOOT!` sans supprimer
+les dossiers de logs. Il peut être lancé directement depuis le dossier du
+dashboard :
+
+``` bash
+cd ~/Codage/Python/RaspberryDashboard
+python3 reboot_ack.py
+```
+
+Pour pouvoir l'utiliser depuis n'importe quel dossier avec la commande
+`reboot-ack`, créer un petit lanceur dans `~/bin` :
+
+``` bash
+mkdir -p ~/bin
+nano ~/bin/reboot-ack
+```
+
+Contenu du fichier `~/bin/reboot-ack` :
+
+``` sh
+#!/bin/sh
+cd /home/morfredus/Codage/Python/RaspberryDashboard || exit 1
+exec python3 reboot_ack.py "$@"
+```
+
+Adapter le chemin `/home/morfredus/Codage/Python/RaspberryDashboard` si le
+projet est installé ailleurs.
+
+Rendre le lanceur exécutable :
+
+``` bash
+chmod +x ~/bin/reboot-ack
+```
+
+Vérifier que `~/bin` est bien dans le `PATH` :
+
+``` bash
+command -v reboot-ack
+```
+
+Utilisation :
+
+``` bash
+reboot-ack
 ```
 
 ## Mise à jour

@@ -12,6 +12,12 @@ from config import (
     NETWORK_PROBE_GRACE,
 )
 
+try:
+    from reboot_alert import get_reboot_alert
+except Exception:
+    def get_reboot_alert():
+        return {"active": False, "count": 0, "latest": None}
+
 
 def _read_version():
     try:
@@ -74,8 +80,6 @@ def _uptime():
 
     except Exception:
         return "?"
-
-
 def _service_running(service: str):
     try:
         subprocess.check_output(
@@ -159,6 +163,8 @@ def get_system_info():
         "disk_total_gb": round(disk.total / (1024**3), 1),
 
         "uptime": _uptime(),
+
+        "reboot_alert": get_reboot_alert(),
 
         "services": {
             name: _service_state(name, network_ready)

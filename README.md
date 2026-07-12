@@ -21,7 +21,7 @@ ni écran principal.
     │ WIFI  --                             │
     │ mDNS  pi4fred.local                  │
     ├────────────────────────────────────┤
-    │ Uptime 3j 4h                         │
+    │ Uptime 3j 4h              REBOOT!    │   si un reboot non demandé est détecté
     │ ● Load 0.15 0.22 0.30   4 %          │   moyennes 1/5/15 min + % cœurs
     ├────────────────────────────────────┤
     │ GatewayLab                    ●      │
@@ -86,6 +86,41 @@ SERVICE_LABELS = {
 ```
 
 Ajouter ou retirer un service ne demande de modifier que ce dictionnaire.
+
+### Alerte reboot non demandé
+
+Les chemins ci-dessous correspondent à l'installation de `morfredus` sur
+`pi4fred`. Pour une autre machine ou un autre utilisateur, remplacer
+`/home/morfredus` par le dossier personnel concerné, par exemple
+`/home/<utilisateur>`.
+
+Si le script de surveillance des redémarrages crée un rapport dans
+`/home/morfredus/Logs/`, le dashboard peut afficher un badge rouge `REBOOT!`
+sur la ligne `Uptime`.
+
+Le dashboard ne tient compte que d'un dossier `Boot_*` lié au démarrage
+système en cours. Les anciens rapports restent donc archivés sans déclencher
+le badge au prochain boot.
+
+Réglages dans `config.py` :
+
+``` python
+REBOOT_ALERT_LOG_DIR = Path("/home/morfredus/Logs")
+REBOOT_ALERT_PATTERNS = ("Boot_*",)
+REBOOT_ALERT_BOOT_WINDOW_SECONDS = 10 * 60
+REBOOT_ALERT_ACK_FILE = Path("/home/morfredus/Logs/.dashboard_reboot_ack")
+```
+
+Acquitter l'alerte sans supprimer les logs :
+
+``` bash
+cd ~/Codage/Python/RaspberryDashboard
+python3 reboot_ack.py
+```
+
+L'acquittement écrit le nom du rapport courant dans
+`/home/morfredus/Logs/.dashboard_reboot_ack`. Au prochain reboot non demandé,
+un nouveau dossier `Boot_*` aura un nouveau nom et le badge réapparaîtra.
 
 ### Version
 

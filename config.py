@@ -118,6 +118,18 @@ SSD_CRITICAL = 95
 LOAD_WARNING = 100
 LOAD_CRITICAL = 150
 
+# ---------------------------------------------------------------------
+# Alerte reboot non demandé
+# ---------------------------------------------------------------------
+# Le script de surveillance cree un dossier par reboot inattendu, par exemple :
+# /home/morfredus/Logs/Boot_2026-07-12T15-19-07+02-00_pi4fred_d3ff81ab
+# L'alerte ne tient compte que du dossier Boot_* correspondant au boot actuel.
+
+REBOOT_ALERT_LOG_DIR = Path("/home/morfredus/Logs")
+REBOOT_ALERT_PATTERNS = ("Boot_*",)
+REBOOT_ALERT_BOOT_WINDOW_SECONDS = 10 * 60
+REBOOT_ALERT_ACK_FILE = Path("/home/morfredus/Logs/.dashboard_reboot_ack")
+
 
 def health_color(value, warning, critical):
     """Retourne la couleur de la pastille selon la valeur et ses seuils."""
