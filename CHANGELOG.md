@@ -1,5 +1,37 @@
 # CHANGELOG
 
+## v1.2.1
+
+### Supervision
+
+-   **Auto-supervision du dashboard.** Le service systemd `dashboard` est
+    désormais affiché parmi les surveillances (pastille verte tant qu'il tourne
+    en service), via `SERVICE_LABELS` → `systemctl is-active dashboard`.
+-   Retrait de `componenthub` de la partie ESP32 (`SERVICE_LABELS` /
+    `NETWORK_SERVICES`) : ComponentHub n'existe plus en ESP32, il est désormais
+    supervisé comme application de bureau (heartbeat morfBeacon).
+
+## v1.2.0
+
+### Supervision
+
+-   **Écoute des applications de bureau (morfBeacon).** Le dashboard écoute
+    désormais les heartbeats UDP diffusés par **ComponentHub**, **SiteWatch**
+    (et les futurs outils) sur le port `45454`, et indique si chaque application
+    de bureau est en ligne. Modèle *push présence* : aucune sonde, aucune IP à
+    connaître, découverte automatique ; une application sans heartbeat depuis
+    `BEACON_OFFLINE_AFTER` secondes (60 s par défaut) est considérée hors ligne.
+-   Nouveau module `beacon_listener.py` : écouteur UDP en tâche de fond
+    (bibliothèque standard uniquement).
+-   Applications surveillées définies dans `BEACON_APPS` (`config.py`) : ajouter
+    un futur projet ne demande qu'une ligne.
+
+### Interface
+
+-   **Zone des services en deux colonnes** : jusqu'à **6 surveillances**
+    affichées (services systemd + applications de bureau), pastilles de couleur
+    conservées. Les noms trop longs sont abrégés et terminés par « . ».
+
 ## v1.1.0
 
 ### Matériel

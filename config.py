@@ -147,9 +147,9 @@ def health_color(value, warning, critical):
 # ---------------------------------------------------------------------
 
 SERVICE_LABELS = {
-    "gatewaylab": "GatewayLab",
-    "componenthub": "ComponentHub",
-    "meteohub": "MeteoHub",
+    "dashboard": "DashBoard",      # service systemd local (systemctl is-active)
+    "gatewaylab": "GatewayLab",    # ESP32 (sonde reseau, voir NETWORK_SERVICES)
+    "meteohub": "MeteoHub",        # ESP32 (sonde reseau, voir NETWORK_SERVICES)
 }
 
 # Services surveillés par sonde réseau plutôt que par systemd.
@@ -158,11 +158,6 @@ SERVICE_LABELS = {
 NETWORK_SERVICES = {
     "gatewaylab": {
         "host": "gatewaylab.local",  # nom mDNS ou IP fixe de l'ESP32
-        "port": 80,
-        "timeout": 1.0,            # secondes ; borne le temps d'attente si hors ligne
-    },
-    "componenthub": {
-        "host": "componenthub.local",  # nom mDNS ou IP fixe de l'ESP32
         "port": 80,
         "timeout": 1.0,            # secondes ; borne le temps d'attente si hors ligne
     },
@@ -178,3 +173,29 @@ NETWORK_SERVICES = {
 # le WiFi soit associé et stabilisé pour ne pas perturber sa connexion au
 # démarrage. La puce MeteoHub reste rouge tant que ce délai n'est pas écoulé.
 NETWORK_PROBE_GRACE = 45
+
+# ---------------------------------------------------------------------
+# Supervision des applications de bureau par heartbeat (morfBeacon)
+# ---------------------------------------------------------------------
+# Les applications de bureau (ComponentHub, SiteWatch, et les futurs outils)
+# diffusent un petit datagramme UDP « je suis actif » en broadcast sur le LAN
+# (protocole morfBeacon). Le dashboard se contente d'ECOUTER : aucune IP a
+# connaitre, aucune sonde, decouverte automatique. Une application qui n'emet
+# plus pendant BEACON_OFFLINE_AFTER secondes est consideree hors ligne.
+
+# Port UDP commun a tout le parc (identique cote applications).
+BEACON_PORT = 45454
+
+# Delai sans heartbeat avant de declarer une application hors ligne (secondes).
+BEACON_OFFLINE_AFTER = 60
+
+# Applications a surveiller : cle = nom annonce dans le heartbeat (champ "app"),
+# valeur = libelle affiche a l'ecran.
+# POUR AJOUTER UN FUTUR PROJET : ajouter une ligne ici, rien d'autre a modifier.
+# (Le libelle est tronque a l'affichage s'il est trop long -> le garder court.)
+BEACON_APPS = {
+    "ComponentHub": "ComponentHub",
+    "SiteWatch":    "SiteWatch",
+    # "GatewayLab": "GatewayLab",
+    # "MonOutil":   "Mon outil",
+}

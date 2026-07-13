@@ -16,6 +16,7 @@
     ├── ili9341.py
     ├── st7789.py
     ├── systeminfo.py
+    ├── beacon_listener.py
     ├── README.md
     ├── INSTALL.md
     ├── CHANGELOG.md
@@ -34,6 +35,8 @@
 -   `reboot_ack.py` : commande CLI pour acquitter le badge `REBOOT!` sans
     supprimer les logs.
 -   `systeminfo.py` : collecte des informations système.
+-   `beacon_listener.py` : écoute des heartbeats morfBeacon (présence des
+    applications de bureau ComponentHub / SiteWatch / futurs outils).
 -   `screen.py` : sélection du pilote d'écran selon `config.py`.
 -   `ili9341.py` : pilote matériel ILI9341.
 -   `st7789.py` : pilote matériel ST7789.

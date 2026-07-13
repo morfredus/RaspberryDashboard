@@ -10,6 +10,7 @@ from boot import BootScreen
 from display import DashboardDisplay
 from screen import Display
 from systeminfo import get_system_info
+from beacon_listener import start as start_beacon
 from config import UPDATE_INTERVAL
 
 
@@ -17,6 +18,10 @@ def main():
 
     lcd = Display()
     ui = DashboardDisplay()
+
+    # Ecoute des heartbeats morfBeacon (ComponentHub, SiteWatch, futurs outils)
+    # en tache de fond, des le demarrage : la presence est prete des le 1er rendu.
+    start_beacon()
 
     try:
         # Animation de démarrage

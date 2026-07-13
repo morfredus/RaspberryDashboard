@@ -27,7 +27,6 @@ from config import (
     SSD_CRITICAL,
     LOAD_WARNING,
     LOAD_CRITICAL,
-    SERVICE_LABELS,
     health_color,
 )
 
@@ -158,15 +157,34 @@ class DashboardDisplay:
         draw.rectangle((x0, y0, WIDTH - 10, y0 + badge_h), fill="#C62828")
         draw.text((x0 + pad_x, y0 + 3), txt, fill="white", font=self.title_font)
 
-    def _services(self, draw, info):
-        y = 252
+    def _fit(self, draw, text, max_w):
+        """Tronque 'text' pour tenir dans max_w px ; le termine par '.' si tronque."""
+        if draw.textlength(text, font=self.font) <= max_w:
+            return text
+        while text and draw.textlength(text + ".", font=self.font) > max_w:
+            text = text[:-1]
+        return (text + ".") if text else ""
 
-        for service, running in info["services"].items():
-            name = SERVICE_LABELS.get(service, service.capitalize())
-            draw.text((10, y), name, fill="white", font=self.font)
-            color = "lime" if running else "red"
-            draw.ellipse((SERVICE_DOT_X, y+2, SERVICE_DOT_X+8, y+10), fill=color)
-            y += 18
+    def _services(self, draw, info):
+        # Zone en DEUX colonnes : jusqu'a 6 surveillances (3 par colonne).
+        # Chaque service porte deja son libelle et sa couleur de pastille
+        # (resolus dans systeminfo) ; l'affichage n'a plus qu'a les disposer.
+        services = info.get("services", [])
+        ROWS = 3
+        y0 = 252
+        row_h = 18
+        columns = (   # (x du nom, x de la pastille) par colonne
+            (8,   106),   # gauche
+            (128, 226),   # droite
+        )
+        name_gap = 6
+
+        for i, svc in enumerate(services[:ROWS * len(columns)]):
+            name_x, dot_x = columns[i // ROWS]     # 0..2 -> gauche, 3..5 -> droite
+            y = y0 + (i % ROWS) * row_h
+            label = self._fit(draw, svc.get("label", ""), dot_x - name_x - name_gap)
+            draw.text((name_x, y), label, fill="white", font=self.font)
+            draw.ellipse((dot_x, y + 2, dot_x + 8, y + 10), fill=svc.get("color", "gray"))
 
 
 if __name__ == "__main__":

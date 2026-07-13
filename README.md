@@ -24,9 +24,9 @@ ni écran principal.
     │ Uptime 3j 4h              REBOOT!    │   si un reboot non demandé est détecté
     │ ● Load 0.15 0.22 0.30   4 %          │   moyennes 1/5/15 min + % cœurs
     ├────────────────────────────────────┤
-    │ GatewayLab                    ●      │
-    │ ComponentHub                  ●      │   état des services systemd
-    │ MeteoHub                      ●      │
+    │ GatewayLab      ● SiteWatch     ●    │   services systemd (gauche) +
+    │ ComponentH.     ● ComponentH.   ●    │   applis de bureau via morfBeacon
+    │ MeteoHub        ●                    │   (droite) — 6 max, noms abrégés
     └────────────────────────────────────┘
 
 Les **pastilles de santé** changent de couleur selon des seuils :
@@ -86,6 +86,29 @@ SERVICE_LABELS = {
 ```
 
 Ajouter ou retirer un service ne demande de modifier que ce dictionnaire.
+
+### Applications de bureau (heartbeat morfBeacon)
+
+En plus des services systemd, le dashboard **écoute** sur le réseau local les
+applications de bureau (**ComponentHub**, **SiteWatch**, futurs outils) qui
+diffusent un petit heartbeat UDP « je suis actif » (protocole morfBeacon, port
+`45454`). Rien à configurer côté réseau : découverte automatique, aucune IP à
+connaître. Une application sans heartbeat depuis `BEACON_OFFLINE_AFTER` secondes
+est affichée hors ligne.
+
+Les applications surveillées sont listées dans `BEACON_APPS` — la **clé** est le
+nom annoncé par l'application, la **valeur** le libellé affiché :
+
+``` python
+BEACON_APPS = {
+    "ComponentHub": "ComponentHub",
+    "SiteWatch":    "SiteWatch",
+}
+```
+
+Ajouter un futur projet ne demande qu'une ligne ici. La zone d'état affiche
+jusqu'à **6 surveillances sur deux colonnes** (services systemd + applications de
+bureau) ; les noms trop longs sont abrégés et terminés par « . ».
 
 ### Alerte reboot non demandé
 

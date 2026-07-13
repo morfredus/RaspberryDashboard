@@ -10,7 +10,11 @@ from config import (
     SERVICE_LABELS,
     NETWORK_SERVICES,
     NETWORK_PROBE_GRACE,
+    BEACON_APPS,
+    GREEN, RED, ORANGE,
 )
+
+from beacon_listener import status as beacon_status
 
 try:
     from reboot_alert import get_reboot_alert
@@ -119,6 +123,17 @@ def _service_state(name: str, network_ready: bool = True):
     return _service_running(name)
 
 
+def _beacon_color(online: bool, state):
+    """Couleur de la pastille d'une application supervisee par heartbeat."""
+    if not online:
+        return RED
+    if state == "warning":
+        return ORANGE
+    if state == "error":
+        return RED
+    return GREEN
+
+
 def get_system_info():
 
     disk = shutil.disk_usage("/")
@@ -129,6 +144,24 @@ def get_system_info():
     eth = _get_ip("eth0")
     wifi = _get_ip("wlan0")
     network_ready = bool(eth or wifi) and _uptime_seconds() >= NETWORK_PROBE_GRACE
+
+    # Services affiches : d'abord les services systeme/reseau (systemd + sondes
+    # ESP32), puis les applications de bureau vues par heartbeat morfBeacon.
+    # Chaque entree porte deja son libelle et sa couleur de pastille -> l'affichage
+    # n'a plus qu'a les disposer.
+    services = []
+    for key in SERVICE_LABELS:
+        online = _service_state(key, network_ready)
+        services.append({
+            "label": SERVICE_LABELS[key],
+            "color": GREEN if online else RED,
+        })
+    for app, label in BEACON_APPS.items():
+        online, state = beacon_status(app)
+        services.append({
+            "label": label,
+            "color": _beacon_color(online, state),
+        })
 
     return {
 
@@ -166,10 +199,7 @@ def get_system_info():
 
         "reboot_alert": get_reboot_alert(),
 
-        "services": {
-            name: _service_state(name, network_ready)
-            for name in SERVICE_LABELS
-        }
+        "services": services,
     }
 
 
