@@ -1,50 +1,59 @@
 # RaspberryDashboard
 
-Tableau de bord système pour Raspberry Pi, affiché sur un petit écran
-**ILI9341 ou ST7789 SPI (240 × 320)**. Il donne, en un coup d'œil, l'état de santé de
-la machine : CPU, mémoire, disque, charge, réseau et services.
+*Read in another language: **English** (this document) · [Français](README.fr.md).*
 
-L'objectif : connaître l'état du Raspberry en moins d'une seconde, sans clavier
-ni écran principal.
+![Platform](https://img.shields.io/badge/Platform-Raspberry%20Pi-C51A4A?logo=raspberrypi)
+![Python](https://img.shields.io/badge/Python-3-3776AB?logo=python&logoColor=white)
+![Display](https://img.shields.io/badge/Display-ILI9341%20%7C%20ST7789-informational)
+![License](https://img.shields.io/badge/License-GPL--3.0--only-blue)
 
-## Aperçu de l'affichage
+A system dashboard for the Raspberry Pi, shown on a small **ILI9341 or ST7789 SPI
+screen (240 × 320)**. At a glance it gives the health of the machine — CPU,
+memory, disk, load, network and services — plus the **presence of the workshop's
+desktop apps** (ComponentHub, SiteWatch…) on the local network.
+
+The goal: know the state of the Raspberry in under a second, with no keyboard and
+no main screen.
+
+## Display overview
 
     ┌────────────────────────────────────┐
-    │ pi4fred          v1.0.1     13:25:59│   bandeau : hôte / version / heure
+    │ pi4fred          v1.2.1     13:25:59│   header: host / version / time
     ├────────────────────────────────────┤
-    │ ● CPU    2.1 %        43.7 °C        │   pastille de santé + température
+    │ ● CPU    2.1 %        43.7 °C        │   health dot + temperature
     │ ● RAM   42.9 %                       │
     │ ● Swap   2.1 %                       │
-    │ ● SSD    8.7 %       8 / 98 Gio      │   % occupé + utilisé / capacité
+    │ ● SSD    8.7 %       8 / 98 Gio      │   % used + used / total
     ├────────────────────────────────────┤
     │ ETH   192.168.1.42                   │
     │ WIFI  --                             │
     │ mDNS  pi4fred.local                  │
     ├────────────────────────────────────┤
-    │ Uptime 3j 4h              REBOOT!    │   si un reboot non demandé est détecté
-    │ ● Load 0.15 0.22 0.30   4 %          │   moyennes 1/5/15 min + % cœurs
+    │ Uptime 3j 4h              REBOOT!    │   if an unexpected reboot is detected
+    │ ● Load 0.15 0.22 0.30   4 %          │   1/5/15 min averages + % of cores
     ├────────────────────────────────────┤
-    │ GatewayLab      ● SiteWatch     ●    │   services systemd (gauche) +
-    │ ComponentH.     ● ComponentH.   ●    │   applis de bureau via morfBeacon
-    │ MeteoHub        ●                    │   (droite) — 6 max, noms abrégés
+    │ DashBoard       ● ComponentH.   ●    │   systemd services (left) +
+    │ GatewayLab      ● SiteWatch     ●    │   desktop apps via morfBeacon
+    │ MeteoHub        ●                    │   (right) — up to 6, names abbreviated
     └────────────────────────────────────┘
 
-Les **pastilles de santé** changent de couleur selon des seuils :
+The **dots** change color against thresholds:
 
--   🟢 **Vert** : fonctionnement normal
--   🟠 **Orange** : seuil d'avertissement
--   🔴 **Rouge** : seuil critique
+-   🟢 **Green**: normal / online
+-   🟠 **Orange**: warning threshold
+-   🔴 **Red**: critical / offline
 
-## Matériel
+## Hardware
 
-Voir [HARDWARE.md](HARDWARE.md) pour l'écran, le brochage et le SPI.
+See [docs/fr/HARDWARE.md](docs/fr/HARDWARE.md) *(FR)* for the screen, pinout and
+SPI, and [docs/fr/CABLAGE.md](docs/fr/CABLAGE.md) *(FR)* for the detailed wiring.
 
 ## Installation
 
-Voir [INSTALL.md](INSTALL.md) pour l'installation en service `systemd`
-(démarrage automatique au boot).
+See [docs/fr/INSTALL.md](docs/fr/INSTALL.md) *(FR)* to install it as a `systemd`
+service (auto-start at boot).
 
-Test rapide, sans installer le service :
+Quick test, without installing the service:
 
 ``` bash
 cd ~/Codage/Python/RaspberryDashboard
@@ -53,11 +62,11 @@ python3 dashboard.py
 
 ## Configuration
 
-Tous les réglages sont centralisés dans [config.py](config.py).
+All settings live in [config.py](config.py).
 
-### Seuils de santé
+### Health thresholds
 
-Chaque métrique possède un seuil d'avertissement et un seuil critique :
+Each metric has a warning and a critical threshold:
 
 ``` python
 CPU_WARNING = 70      ;  CPU_CRITICAL = 90
@@ -65,39 +74,36 @@ RAM_WARNING = 80      ;  RAM_CRITICAL = 95
 SWAP_WARNING = 20     ;  SWAP_CRITICAL = 50
 TEMP_WARNING = 65     ;  TEMP_CRITICAL = 75      # °C
 SSD_WARNING = 85      ;  SSD_CRITICAL = 95
-LOAD_WARNING = 100    ;  LOAD_CRITICAL = 150     # % des cœurs
+LOAD_WARNING = 100    ;  LOAD_CRITICAL = 150     # % of cores
 ```
 
-`LOAD` est exprimé en pourcentage des cœurs : `100 %` = tous les cœurs
-pleinement occupés.
+`LOAD` is expressed as a percentage of cores: `100 %` = every core fully busy.
 
-### Services surveillés
+### Monitored services (systemd / ESP32)
 
-Les services affichés sont définis dans `SERVICE_LABELS` — la **clé** est le
-nom de l'unité systemd (`systemctl is-active <clé>`), la **valeur** est le
-libellé affiché :
+Displayed services are defined in `SERVICE_LABELS` — the **key** is the unit name,
+the **value** the displayed label:
 
 ``` python
 SERVICE_LABELS = {
-    "gatewaylab": "GatewayLab",
-    "componenthub": "ComponentHub",
-    "meteohub": "MeteoHub",
+    "dashboard":  "DashBoard",     # local systemd service (systemctl is-active)
+    "gatewaylab": "GatewayLab",    # ESP32 (network probe)
+    "meteohub":   "MeteoHub",      # ESP32 (network probe)
 }
 ```
 
-Ajouter ou retirer un service ne demande de modifier que ce dictionnaire.
+A **local** service (such as the dashboard itself) is checked with
+`systemctl is-active`. An **ESP32** service, which has no systemd, is also
+declared in `NETWORK_SERVICES` and checked with a TCP probe against its web
+server.
 
-### Applications de bureau (heartbeat morfBeacon)
+### Desktop apps (morfBeacon heartbeat)
 
-En plus des services systemd, le dashboard **écoute** sur le réseau local les
-applications de bureau (**ComponentHub**, **SiteWatch**, futurs outils) qui
-diffusent un petit heartbeat UDP « je suis actif » (protocole morfBeacon, port
-`45454`). Rien à configurer côté réseau : découverte automatique, aucune IP à
-connaître. Une application sans heartbeat depuis `BEACON_OFFLINE_AFTER` secondes
-est affichée hors ligne.
-
-Les applications surveillées sont listées dans `BEACON_APPS` — la **clé** est le
-nom annoncé par l'application, la **valeur** le libellé affiché :
+On top of the systemd services, the dashboard **listens** on the local network
+for the desktop apps (**ComponentHub**, **SiteWatch**, future tools) that
+broadcast a small "I'm alive" UDP heartbeat (morfBeacon protocol, port `45454`).
+Nothing to configure on the network side: automatic discovery, no IP to know. An
+app with no heartbeat for `BEACON_OFFLINE_AFTER` seconds is shown offline.
 
 ``` python
 BEACON_APPS = {
@@ -106,58 +112,38 @@ BEACON_APPS = {
 }
 ```
 
-Ajouter un futur projet ne demande qu'une ligne ici. La zone d'état affiche
-jusqu'à **6 surveillances sur deux colonnes** (services systemd + applications de
-bureau) ; les noms trop longs sont abrégés et terminés par « . ».
+Adding a future project is a single line. The status area shows up to **6
+monitored items across two columns** (systemd services + desktop apps); names
+that are too long are abbreviated with a trailing ".".
 
-### Alerte reboot non demandé
+### Unexpected-reboot alert
 
-Les chemins ci-dessous correspondent à l'installation de `morfredus` sur
-`pi4fred`. Pour une autre machine ou un autre utilisateur, remplacer
-`/home/morfredus` par le dossier personnel concerné, par exemple
-`/home/<utilisateur>`.
-
-Si le script de surveillance des redémarrages crée un rapport dans
-`/home/morfredus/Logs/`, le dashboard peut afficher un badge rouge `REBOOT!`
-sur la ligne `Uptime`.
-
-Le dashboard ne tient compte que d'un dossier `Boot_*` lié au démarrage
-système en cours. Les anciens rapports restent donc archivés sans déclencher
-le badge au prochain boot.
-
-Réglages dans `config.py` :
-
-``` python
-REBOOT_ALERT_LOG_DIR = Path("/home/morfredus/Logs")
-REBOOT_ALERT_PATTERNS = ("Boot_*",)
-REBOOT_ALERT_BOOT_WINDOW_SECONDS = 10 * 60
-REBOOT_ALERT_ACK_FILE = Path("/home/morfredus/Logs/.dashboard_reboot_ack")
-```
-
-Acquitter l'alerte sans supprimer les logs :
-
-``` bash
-cd ~/Codage/Python/RaspberryDashboard
-python3 reboot_ack.py
-```
-
-L'acquittement écrit le nom du rapport courant dans
-`/home/morfredus/Logs/.dashboard_reboot_ack`. Au prochain reboot non demandé,
-un nouveau dossier `Boot_*` aura un nouveau nom et le badge réapparaîtra.
+If a reboot-watch script writes a report under `/home/morfredus/Logs/`, the
+dashboard shows a red `REBOOT!` badge on the `Uptime` line. Settings in
+`config.py` (`REBOOT_ALERT_*`); acknowledge without deleting the logs via
+`python3 reboot_ack.py`. Details: [docs/fr/INSTALL.md](docs/fr/INSTALL.md) *(FR)*.
 
 ### Version
 
-Le numéro affiché dans le bandeau est lu dans le fichier `VERSION` à la racine.
-En son absence, `dev` est affiché.
+The number shown in the header is read from the `VERSION` file at the repository
+root. When absent, `dev` is shown.
 
 ## Documentation
 
--   [ARCHITECTURE.md](ARCHITECTURE.md) — structure du projet et rôle des modules
--   [HARDWARE.md](HARDWARE.md) — matériel et brochage
--   [INSTALL.md](INSTALL.md) — installation du service systemd
--   [CHANGELOG.md](CHANGELOG.md) — historique des versions
--   [ROADMAP.md](ROADMAP.md) — évolutions prévues
+The in-depth guides are currently written in **French** under
+[`docs/fr/`](docs/fr/README.md); an English index is at
+[`docs/en/`](docs/en/README.md).
 
-## Version
+| Document | Contents |
+|---|---|
+| [docs/fr/ARCHITECTURE.md](docs/fr/ARCHITECTURE.md) *(FR)* | Project structure and the role of each module |
+| [docs/fr/HARDWARE.md](docs/fr/HARDWARE.md) *(FR)* | Hardware and pinout |
+| [docs/fr/CABLAGE.md](docs/fr/CABLAGE.md) *(FR)* | Detailed wiring |
+| [docs/fr/INSTALL.md](docs/fr/INSTALL.md) *(FR)* | systemd service installation |
+| [CHANGELOG.md](CHANGELOG.md) | Version history |
+| [ROADMAP.md](ROADMAP.md) | Planned work |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guide |
 
-Voir le fichier `VERSION` et le [CHANGELOG.md](CHANGELOG.md).
+## License
+
+Distributed under the [GPL-3.0-only license](LICENSE). © 2026 morfredus.
