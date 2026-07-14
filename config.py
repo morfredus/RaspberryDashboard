@@ -82,6 +82,29 @@ SPI_DEVICE = 0
 SPI_SPEED = 40_000_000
 
 # ---------------------------------------------------------------------
+# Rétroéclairage (backlight sur LED_PIN)
+# ---------------------------------------------------------------------
+# Le rétroéclairage est piloté par LED_PIN. En PWM on peut faire varier sa
+# luminosité (0 = éteint, 100 = plein) ; sinon c'est du tout-ou-rien. GPIO18
+# supporte le PWM ; ici PWM logiciel (RPi.GPIO), suffisant pour deux niveaux.
+# Passer à pigpio (PWM matériel) plus tard si un léger scintillement apparaît.
+BACKLIGHT_PWM = True         # False = tout-ou-rien (>0 allumé, 0 éteint)
+BACKLIGHT_FREQ_HZ = 1000     # fréquence du PWM logiciel
+BACKLIGHT_FULL = 100         # niveau (%) en fonctionnement normal
+
+# ---------------------------------------------------------------------
+# Mise en veille (écran de veille anti-marquage / économie d'énergie)
+# ---------------------------------------------------------------------
+# Sans capteur physique, la présence est déduite de l'activité SSH (voir
+# activity.py). Après SCREENSAVER_IDLE_SECONDS sans activité, l'écran bascule
+# sur un cadre minimal mobile (heure, uptime, état global du système) et le
+# rétroéclairage descend à SCREENSAVER_BACKLIGHT. La moindre activité SSH
+# (frappe ou sortie d'une commande) réveille l'écran immédiatement.
+SCREENSAVER_ENABLED = True       # False = dashboard permanent, jamais de veille
+SCREENSAVER_IDLE_SECONDS = 60    # délai d'inactivité SSH avant la veille
+SCREENSAVER_BACKLIGHT = 15       # niveau (%) du rétroéclairage en veille
+
+# ---------------------------------------------------------------------
 # Couleurs
 # ---------------------------------------------------------------------
 
@@ -101,6 +124,7 @@ CYAN = "lightblue"
 
 CPU_WARNING = 70
 CPU_CRITICAL = 90
+CPU_ELEVATED = 50   # charge modérée (jaune) — pastille « charge CPU » de la veille
 
 RAM_WARNING = 80
 RAM_CRITICAL = 95

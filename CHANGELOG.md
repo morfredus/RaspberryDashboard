@@ -6,6 +6,58 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and the project follows [Semantic Versioning](https://semver.org/) (the `VERSION`
 file at the repository root).
 
+## [1.5.0] — 2026-07-14
+
+### Added — standby (screensaver) mode
+
+An anti-burn-in / power-saving standby screen that takes over from the dashboard
+after a period of inactivity, with **software presence** detection (no sensor
+yet). Numbered summary of the changes:
+
+1. **Standby triggered by SSH inactivity.** After `SCREENSAVER_IDLE_SECONDS`
+   (60 s) with no SSH terminal activity, the display switches to a minimal
+   standby frame; any SSH activity wakes it immediately. Disable globally with
+   `SCREENSAVER_ENABLED = False`. A start-up grace keeps the dashboard visible
+   right after boot (no immediate standby when no one is connected yet).
+2. **Presence from SSH activity (`activity.py`).** New module reading the most
+   recent mtime of the `/dev/pts/*` pseudo-terminals — the same signal as the
+   `IDLE` column of `w`. It does not depend on the utmp `host` field (sometimes
+   empty), which makes detection reliable.
+3. **Backlight dimming (software PWM).** `st7789.py` / `ili9341.py` now expose
+   `set_backlight(0-100)` driven by PWM on `LED_PIN` (GPIO 18): the standby
+   screen drops to `SCREENSAVER_BACKLIGHT` (15 %) and returns to `BACKLIGHT_FULL`
+   when active. New `config.py` keys `BACKLIGHT_PWM`, `BACKLIGHT_FREQ_HZ`,
+   `BACKLIGHT_FULL`; set `BACKLIGHT_PWM = False` for an on/off backlight.
+4. **Three status dots on the standby frame (`systeminfo.screensaver_status`).**
+   A row of three dots summarizing, left to right: **G** global/thermal
+   (green/orange/red against `TEMP_*`), **P** CPU load on **4 levels**
+   (green < `CPU_ELEVATED` 50 % · yellow · orange ≥ `CPU_WARNING` · red ≥
+   `CPU_CRITICAL`), **S** services (green if all up, orange if at least one is
+   down — never red; the `dashboard` service is excluded from the test since it
+   is necessarily running). New threshold `CPU_ELEVATED` in `config.py`.
+5. **Standby-frame legibility.** A letter (**G / P / S**) is drawn above each dot
+   in an intermediate font size and in the uptime colour; the clock is softened
+   (grey instead of pure white) and the uptime is slightly enlarged. The frame
+   is repositioned at every refresh to avoid fixing the same pixels.
+6. **`overall_status()` helper** in `systeminfo.py`: a single aggregated health
+   verdict (`ok` / `warning` / `critical`) over the metrics and services.
+
+These screens are LCD panels (ST7789 / ILI9341): true permanent burn-in is an
+OLED phenomenon, so here the main gain is the reduced backlight (power draw and
+LED lifespan), the moving frame guarding only against transient retention.
+
+## [1.4.0] — 2026-07-13
+
+### Added
+- **`beacon_status.py`** — an SSH-run CLI that discovers the live morfBeacon apps
+  on the LAN, queries their `/status` endpoint and prints their detailed metrics,
+  producing a human-friendly **Markdown report** (`beacon_status.md`). The
+  headless screen only shows presence; this tool gives the detail on demand.
+
+### Changed
+- `beacon_listener.py` now sets `SO_REUSEPORT` (best-effort) so the dashboard
+  service and `beacon_status.py` can listen on port `45454` at the same time.
+
 ## [1.3.0] — 2026-07-13
 
 ### Changed

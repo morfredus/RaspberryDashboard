@@ -25,6 +25,9 @@ from config import (
     ST7789_Y_OFFSET,
     ST7789_MADCTL,
     ST7789_INVERT,
+    BACKLIGHT_PWM,
+    BACKLIGHT_FREQ_HZ,
+    BACKLIGHT_FULL,
 )
 
 
@@ -43,6 +46,7 @@ class ST7789:
 
         GPIO.setup(LED_PIN, GPIO.OUT)
         GPIO.output(LED_PIN, GPIO.LOW)
+        self._pwm = None  # objet PWM du rétroéclairage (créé après l'init dalle)
 
         self.spi = spidev.SpiDev()
         self.spi.open(SPI_BUS, SPI_DEVICE)
@@ -109,7 +113,26 @@ class ST7789:
         self.write_cmd(0x29)      # DISPON : allumage de la dalle
         time.sleep(0.05)
 
-        GPIO.output(LED_PIN, GPIO.HIGH)
+        self._init_backlight()
+
+    def _init_backlight(self):
+        """Allume le rétroéclairage : PWM (luminosité variable) ou tout-ou-rien."""
+        if BACKLIGHT_PWM:
+            self._pwm = GPIO.PWM(LED_PIN, BACKLIGHT_FREQ_HZ)
+            self._pwm.start(BACKLIGHT_FULL)
+        else:
+            GPIO.output(LED_PIN, GPIO.HIGH)
+
+    def set_backlight(self, level):
+        """Règle la luminosité du rétroéclairage (0-100 %).
+
+        Sans PWM, tout niveau > 0 allume à fond et 0 éteint.
+        """
+        level = max(0, min(100, int(level)))
+        if self._pwm is not None:
+            self._pwm.ChangeDutyCycle(level)
+        else:
+            GPIO.output(LED_PIN, GPIO.HIGH if level > 0 else GPIO.LOW)
 
     def _set_window(self, x0, y0, x1, y1):
         """Définit la fenêtre d'écriture (avec décalage éventuel de la dalle)."""
@@ -150,6 +173,8 @@ class ST7789:
         self.display_image(Image.new("RGB", (WIDTH, HEIGHT), color))
 
     def close(self):
+        if self._pwm is not None:
+            self._pwm.stop()
         GPIO.output(LED_PIN, GPIO.LOW)
         self.spi.close()
         GPIO.cleanup()
@@ -170,6 +195,9 @@ class Display:
 
     def clear(self, color="black"):
         self.driver.clear(color)
+
+    def set_backlight(self, level):
+        self.driver.set_backlight(level)
 
     def close(self):
         self.driver.close()
