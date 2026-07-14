@@ -17,6 +17,8 @@ no main screen.
 
 ## Display overview
 
+<img src="docs/images/dashboard.png" alt="Dashboard" width="240" />
+
     ┌────────────────────────────────────┐
     │ pi4fred          v1.2.1     13:25:59│   header: host / version / time
     ├────────────────────────────────────┤
@@ -127,6 +129,49 @@ dashboard shows a red `REBOOT!` badge on the `Uptime` line. Settings in
 
 The number shown in the header is read from the `VERSION` file at the repository
 root. When absent, `dev` is shown.
+
+## Standby screen (anti-burn-in / power saving)
+
+<img src="docs/images/screensaver.png" alt="Standby screen" width="240" />
+
+After `SCREENSAVER_IDLE_SECONDS` (60 s) with **no SSH activity**, the dashboard
+gives way to a minimal **standby frame** — a small box repositioned at every
+refresh — showing the clock, the uptime and a row of three status dots:
+
+-   **G** — global / thermal: 🟢 OK · 🟠 hot · 🔴 critical
+-   **P** — CPU load (4 levels): 🟢 < 50 % · 🟡 50–70 % · 🟠 70–90 % · 🔴 ≥ 90 %
+-   **S** — services: 🟢 all up · 🟠 at least one down (never red; the
+    `dashboard` service is excluded)
+
+The backlight drops to `SCREENSAVER_BACKLIGHT` and returns to full as soon as you
+touch an SSH session. Presence is detected from SSH terminal activity
+(`activity.py`), pending a real presence sensor.
+
+``` python
+SCREENSAVER_ENABLED = True       # False = dashboard always on, never standby
+SCREENSAVER_IDLE_SECONDS = 60    # SSH inactivity before standby
+SCREENSAVER_BACKLIGHT = 15       # backlight (%) in standby
+BACKLIGHT_PWM = True             # False = on/off backlight (no dimming)
+BACKLIGHT_FULL = 100
+```
+
+These are LCD panels (ST7789 / ILI9341): permanent burn-in is essentially an OLED
+issue, so the real win here is the lower backlight (power, LED lifespan); the
+moving frame only guards against transient retention.
+
+## Detailed metrics on demand (SSH)
+
+The screen is passive: it only shows **presence** (online / offline). To read an
+app's **detailed metrics** without a keyboard, run `beacon_status.py` over SSH —
+it discovers the live apps, queries their `/status` endpoint and writes a
+human-friendly Markdown report (`beacon_status.md`):
+
+``` bash
+python3 beacon_status.py                  # console + beacon_status.md
+python3 beacon_status.py --app SiteWatch   # a single app
+python3 beacon_status.py --listen 8        # longer discovery window
+python3 beacon_status.py --no-file         # console only
+```
 
 ## Documentation
 

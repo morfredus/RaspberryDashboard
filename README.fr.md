@@ -18,6 +18,8 @@ ni écran principal.
 
 ## Aperçu de l'affichage
 
+<img src="docs/images/dashboard.png" alt="Dashboard" width="240" />
+
     ┌────────────────────────────────────┐
     │ pi4fred          v1.2.1     13:25:59│   bandeau : hôte / version / heure
     ├────────────────────────────────────┤
@@ -130,6 +132,51 @@ supprimer les logs via `python3 reboot_ack.py`. Détails :
 
 Le numéro affiché dans le bandeau est lu dans le fichier `VERSION` à la racine.
 En son absence, `dev` est affiché.
+
+## Écran de veille (anti-marquage / économie d'énergie)
+
+<img src="docs/images/screensaver.png" alt="Écran de veille" width="240" />
+
+Après `SCREENSAVER_IDLE_SECONDS` (60 s) **sans activité SSH**, le dashboard
+laisse place à un **cadre de veille** minimal — une petite boîte repositionnée à
+chaque rafraîchissement — affichant l'heure, l'uptime et une rangée de trois
+pastilles d'état :
+
+-   **G** — global / thermique : 🟢 OK · 🟠 ça chauffe · 🔴 critique
+-   **P** — charge processeur (4 niveaux) : 🟢 < 50 % · 🟡 50–70 % · 🟠 70–90 % · 🔴 ≥ 90 %
+-   **S** — services : 🟢 tous actifs · 🟠 au moins un hors ligne (jamais rouge ;
+    le service `dashboard` est exclu du test)
+
+Le rétroéclairage descend à `SCREENSAVER_BACKLIGHT` et remonte à fond dès que tu
+touches une session SSH. La présence est déduite de l'activité des terminaux SSH
+(`activity.py`), en attendant un vrai capteur de présence.
+
+``` python
+SCREENSAVER_ENABLED = True       # False = dashboard permanent, jamais de veille
+SCREENSAVER_IDLE_SECONDS = 60    # inactivité SSH avant la veille
+SCREENSAVER_BACKLIGHT = 15       # rétroéclairage (%) en veille
+BACKLIGHT_PWM = True             # False = rétroéclairage tout-ou-rien (sans variation)
+BACKLIGHT_FULL = 100
+```
+
+Ce sont des dalles LCD (ST7789 / ILI9341) : le marquage permanent est surtout un
+phénomène OLED ; le vrai gain ici est le rétroéclairage réduit (consommation,
+durée de vie de la LED), le cadre mobile ne servant que contre la rémanence
+temporaire.
+
+## Métriques détaillées à la demande (SSH)
+
+L'écran est passif : il n'affiche que la **présence** (en ligne / hors ligne).
+Pour lire les **métriques détaillées** d'une application sans clavier, lancer
+`beacon_status.py` en SSH — il découvre les applis vivantes, interroge leur
+endpoint `/status` et écrit un rapport Markdown lisible (`beacon_status.md`) :
+
+``` bash
+python3 beacon_status.py                   # console + beacon_status.md
+python3 beacon_status.py --app SiteWatch    # une seule application
+python3 beacon_status.py --listen 8         # fenêtre d'écoute plus longue
+python3 beacon_status.py --no-file          # console seulement
+```
 
 ## Documentation
 

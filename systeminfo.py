@@ -11,7 +11,14 @@ from config import (
     NETWORK_SERVICES,
     NETWORK_PROBE_GRACE,
     BEACON_APPS,
-    GREEN, RED, ORANGE,
+    GREEN, RED, ORANGE, YELLOW, GRAY,
+    CPU_WARNING, CPU_CRITICAL, CPU_ELEVATED,
+    RAM_WARNING, RAM_CRITICAL,
+    SWAP_WARNING, SWAP_CRITICAL,
+    SSD_WARNING, SSD_CRITICAL,
+    TEMP_WARNING, TEMP_CRITICAL,
+    LOAD_WARNING, LOAD_CRITICAL,
+    health_color,
 )
 
 from beacon_listener import status as beacon_status
@@ -203,8 +210,94 @@ def get_system_info():
     }
 
 
+def overall_status(info):
+    """État de santé global du système : 'ok', 'warning' ou 'critical'.
+
+    Agrège les métriques système (via les mêmes seuils que l'affichage) et
+    l'état des services/applications supervisés. Sert de pastille unique en
+    mode veille : un coup d'œil suffit à savoir si tout va bien.
+    """
+    reds = oranges = 0
+
+    checks = [
+        (info.get("cpu"), CPU_WARNING, CPU_CRITICAL),
+        (info.get("ram_percent"), RAM_WARNING, RAM_CRITICAL),
+        (info.get("swap_percent"), SWAP_WARNING, SWAP_CRITICAL),
+        (info.get("disk_percent"), SSD_WARNING, SSD_CRITICAL),
+        (info.get("temp"), TEMP_WARNING, TEMP_CRITICAL),
+    ]
+
+    load = info.get("load")
+    cores = info.get("cpu_cores", 1) or 1
+    if load:
+        checks.append((load[0] / cores * 100, LOAD_WARNING, LOAD_CRITICAL))
+
+    for value, warning, critical in checks:
+        color = health_color(value, warning, critical)
+        if color == RED:
+            reds += 1
+        elif color == ORANGE:
+            oranges += 1
+
+    for svc in info.get("services", []):
+        if svc.get("color") == RED:
+            reds += 1
+        elif svc.get("color") == ORANGE:
+            oranges += 1
+
+    if info.get("reboot_alert", {}).get("active"):
+        oranges += 1  # reboot inattendu : attention, sans être critique
+
+    if reds:
+        return "critical"
+    if oranges:
+        return "warning"
+    return "ok"
+
+
+def _cpu_load_color(value):
+    """Pastille de charge CPU à 4 niveaux : vert / jaune / orange / rouge."""
+    if value is None:
+        return GRAY
+    if value >= CPU_CRITICAL:
+        return RED
+    if value >= CPU_WARNING:
+        return ORANGE
+    if value >= CPU_ELEVATED:
+        return YELLOW
+    return GREEN
+
+
+def _services_color(services):
+    """Pastille des services : vert si tous actifs, sinon orange (jamais rouge).
+
+    Le service « Dashboard » lui-même est exclu : il tourne forcément puisque
+    c'est lui qui affiche l'écran, donc son état n'apporte rien.
+    """
+    dashboard_label = SERVICE_LABELS.get("dashboard")
+    relevant = [s for s in services if s.get("label") != dashboard_label]
+    if all(s.get("color") == GREEN for s in relevant):
+        return GREEN
+    return ORANGE
+
+
+def screensaver_status(info):
+    """Trois couleurs de pastille pour l'écran de veille.
+
+    Renvoie (thermique, charge CPU, services) — dans l'ordre d'affichage.
+    """
+    return (
+        health_color(info.get("temp"), TEMP_WARNING, TEMP_CRITICAL),
+        _cpu_load_color(info.get("cpu")),
+        _services_color(info.get("services", [])),
+    )
+
+
 if __name__ == "__main__":
 
     from pprint import pprint
 
-    pprint(get_system_info())
+    info = get_system_info()
+    pprint(info)
+    print("État global :", overall_status(info))
+    print("Pastilles veille (thermique, CPU, services) :", screensaver_status(info))

@@ -39,6 +39,12 @@ class BeaconListener:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:
+            # Permet a plusieurs ecouteurs (le service dashboard + l'outil
+            # beacon_status.py lance en SSH) de recevoir le meme broadcast.
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        except (AttributeError, OSError):
+            pass  # SO_REUSEPORT indisponible (ex. Windows) : coexistence best-effort
+        try:
             sock.bind(("", self._port))
         except OSError:
             # Port occupe : on renonce a l'ecoute, le dashboard fonctionne sans.

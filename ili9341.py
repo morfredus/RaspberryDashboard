@@ -21,6 +21,9 @@ from config import (
     SPI_BUS,
     SPI_DEVICE,
     SPI_SPEED,
+    BACKLIGHT_PWM,
+    BACKLIGHT_FREQ_HZ,
+    BACKLIGHT_FULL,
 )
 
 
@@ -39,6 +42,7 @@ class ILI9341:
 
         GPIO.setup(LED_PIN, GPIO.OUT)
         GPIO.output(LED_PIN, GPIO.LOW)
+        self._pwm = None  # objet PWM du rétroéclairage (créé après l'init dalle)
 
         self.spi = spidev.SpiDev()
         self.spi.open(SPI_BUS, SPI_DEVICE)
@@ -101,7 +105,26 @@ class ILI9341:
         self.write_cmd(0x29)
         time.sleep(0.05)
 
-        GPIO.output(LED_PIN, GPIO.HIGH)
+        self._init_backlight()
+
+    def _init_backlight(self):
+        """Allume le rétroéclairage : PWM (luminosité variable) ou tout-ou-rien."""
+        if BACKLIGHT_PWM:
+            self._pwm = GPIO.PWM(LED_PIN, BACKLIGHT_FREQ_HZ)
+            self._pwm.start(BACKLIGHT_FULL)
+        else:
+            GPIO.output(LED_PIN, GPIO.HIGH)
+
+    def set_backlight(self, level):
+        """Règle la luminosité du rétroéclairage (0-100 %).
+
+        Sans PWM, tout niveau > 0 allume à fond et 0 éteint.
+        """
+        level = max(0, min(100, int(level)))
+        if self._pwm is not None:
+            self._pwm.ChangeDutyCycle(level)
+        else:
+            GPIO.output(LED_PIN, GPIO.HIGH if level > 0 else GPIO.LOW)
 
     def display_image(self, image: Image.Image):
         img = image.convert("RGB")
@@ -127,6 +150,8 @@ class ILI9341:
         self.display_image(Image.new("RGB", (WIDTH, HEIGHT), color))
 
     def close(self):
+        if self._pwm is not None:
+            self._pwm.stop()
         GPIO.output(LED_PIN, GPIO.LOW)
         self.spi.close()
         GPIO.cleanup()
@@ -147,6 +172,9 @@ class Display:
 
     def clear(self, color="black"):
         self.driver.clear(color)
+
+    def set_backlight(self, level):
+        self.driver.set_backlight(level)
 
     def close(self):
         self.driver.close()
