@@ -1,6 +1,6 @@
 # Service systemd pour RaspberryDashboard.
 #
-# L'application est INSTALLÉE dans un dossier fixe (par défaut /opt/raspberrydashboard),
+# L'application est INSTALLÉE dans un dossier fixe (par défaut /opt/morfdashboard),
 # indépendant de l'endroit où vit le clone git : déplacer/renommer le dépôt (ou
 # une synchro Syncthing) ne casse plus le service. install-service.sh remplace
 # __RUN_USER__ et __APP_DIR__.

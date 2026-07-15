@@ -13,7 +13,7 @@ set -euo pipefail
 
 SERVICE_NAME="morfdashboard"
 UNIT_DEST="/etc/systemd/system/$SERVICE_NAME.service"
-APP_DIR="${RD_APP_DIR:-/opt/raspberrydashboard}"
+APP_DIR="${RD_APP_DIR:-/opt/morfdashboard}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"

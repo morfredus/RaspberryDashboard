@@ -23,7 +23,7 @@ file at the repository root).
 ### Added — robust systemd install
 
 - **`scripts/linux/install-service.sh`** installs the app into a **fixed location**
-  (`/opt/raspberrydashboard`), independent of where the git clone lives. Moving or
+  (`/opt/morfdashboard`), independent of where the git clone lives. Moving or
   renaming the repository (or a Syncthing sync) no longer breaks the service. The
   script stops any previous `dashboard` service, copies the app, installs the unit
   (running as the current user, pointing at the fixed dir), enables and starts it,

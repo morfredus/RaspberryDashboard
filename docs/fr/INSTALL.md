@@ -24,7 +24,7 @@ python3 dashboard.py
 ## Installer le service (recommandé)
 
 L'installation **copie l'application dans un dossier fixe**
-(`/opt/raspberrydashboard`), indépendant de l'emplacement du dépôt git. Déplacer
+(`/opt/morfdashboard`), indépendant de l'emplacement du dépôt git. Déplacer
 ou renommer le dépôt (ou une synchronisation Syncthing) ne casse donc plus le
 service.
 
@@ -33,7 +33,7 @@ sudo ./scripts/linux/install-service.sh
 ```
 
 Le script : arrête le service `morfdashboard` s'il tourne déjà, copie
-l'application dans `/opt/raspberrydashboard`, installe le service (exécuté par
+l'application dans `/opt/morfdashboard`, installe le service (exécuté par
 l'utilisateur courant, pointant vers le dossier fixe), l'active au démarrage et
 le lance. Il signale aussi tout autre lancement automatique résiduel (crontab,
 `rc.local`, autostart) à retirer à la main.
@@ -47,7 +47,7 @@ le lance. Il signale aussi tout autre lancement automatique résiduel (crontab,
 sudo ./scripts/linux/update-service.sh
 ```
 
-`git pull`, recopie de l'application dans `/opt/raspberrydashboard`, puis
+`git pull`, recopie de l'application dans `/opt/morfdashboard`, puis
 redémarrage du service.
 
 ## Vérification
@@ -140,7 +140,7 @@ reboot-ack
 
 ## Mise à jour
 
-Utiliser le script (récupère le code, recopie dans `/opt/raspberrydashboard`,
+Utiliser le script (récupère le code, recopie dans `/opt/morfdashboard`,
 redémarre le service) :
 
 ``` bash
@@ -148,7 +148,7 @@ sudo ./scripts/linux/update-service.sh
 ```
 
 > Un simple `git pull` ne suffit pas : l'application s'exécute depuis
-> `/opt/raspberrydashboard`, pas depuis le dépôt. La recopie est indispensable —
+> `/opt/morfdashboard`, pas depuis le dépôt. La recopie est indispensable —
 > c'est ce que fait `update-service.sh`.
 
 ## Vérification finale

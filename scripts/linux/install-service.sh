@@ -2,7 +2,7 @@
 #
 # install-service.sh — Installe RaspberryDashboard en service systemd robuste.
 #
-# Copie l'application dans un dossier FIXE (par défaut /opt/raspberrydashboard),
+# Copie l'application dans un dossier FIXE (par défaut /opt/morfdashboard),
 # hors du clone git, puis installe/active le service « dashboard » pointant là.
 # Ainsi, déplacer le dépôt (ou une synchro Syncthing) ne casse plus rien.
 #
@@ -15,7 +15,7 @@ set -euo pipefail
 
 SERVICE_NAME="morfdashboard"
 UNIT_DEST="/etc/systemd/system/$SERVICE_NAME.service"
-APP_DIR="${RD_APP_DIR:-/opt/raspberrydashboard}"
+APP_DIR="${RD_APP_DIR:-/opt/morfdashboard}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
