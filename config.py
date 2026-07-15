@@ -101,8 +101,8 @@ BACKLIGHT_FULL = 100         # niveau (%) en fonctionnement normal
 # rétroéclairage descend à SCREENSAVER_BACKLIGHT. La moindre activité SSH
 # (frappe ou sortie d'une commande) réveille l'écran immédiatement.
 SCREENSAVER_ENABLED = True       # False = dashboard permanent, jamais de veille
-SCREENSAVER_IDLE_SECONDS = 60    # délai d'inactivité SSH avant la veille
-SCREENSAVER_BACKLIGHT = 15       # niveau (%) du rétroéclairage en veille
+SCREENSAVER_IDLE_SECONDS = 500    # délai d'inactivité SSH avant la veille
+SCREENSAVER_BACKLIGHT = 10       # niveau (%) du rétroéclairage en veille
 
 # ---------------------------------------------------------------------
 # Couleurs
