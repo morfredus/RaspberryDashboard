@@ -171,9 +171,10 @@ def health_color(value, warning, critical):
 # ---------------------------------------------------------------------
 
 SERVICE_LABELS = {
-    "dashboard": "DashBoard",      # service systemd local (systemctl is-active)
-    "gatewaylab": "GatewayLab",    # ESP32 (sonde reseau, voir NETWORK_SERVICES)
-    "meteohub": "MeteoHub",        # ESP32 (sonde reseau, voir NETWORK_SERVICES)
+    "dashboard": "DashBoard",           # service systemd local (systemctl is-active)
+    "homeserverhub": "HomeServerHub",   # service systemd local (homeserverhub is-active)
+    "gatewaylab": "GatewayLab",         # ESP32 (sonde reseau, voir NETWORK_SERVICES)
+    "meteohub": "MeteoHub",             # ESP32 (sonde reseau, voir NETWORK_SERVICES)
 }
 
 # Services surveillés par sonde réseau plutôt que par systemd.
