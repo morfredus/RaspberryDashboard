@@ -9,33 +9,46 @@ Raspberry Pi.
 ## Prérequis
 
 -   Debian 13 (Trixie)
--   Python 3
+-   Python 3, avec les modules `Pillow`, `numpy`, `psutil`, `RPi.GPIO`, `spidev`
+    (installés au niveau système ; `requirements.txt` est vide)
 -   SPI activé
--   Projet installé dans :
 
-``` text
-/home/morfredus/Codage/Python/RaspberryDashboard
-```
+## Vérifier le fonctionnement (sans installer)
 
-Les chemins contenant `/home/morfredus` sont propres à cette installation.
-Pour un autre utilisateur, remplacer `morfredus` par le nom du compte Linux
-concerné.
-
-## Vérifier le fonctionnement
+Depuis le dépôt :
 
 ``` bash
-cd ~/Codage/Python/RaspberryDashboard
 python3 dashboard.py
 ```
 
-## Installer le service
+## Installer le service (recommandé)
+
+L'installation **copie l'application dans un dossier fixe**
+(`/opt/raspberrydashboard`), indépendant de l'emplacement du dépôt git. Déplacer
+ou renommer le dépôt (ou une synchronisation Syncthing) ne casse donc plus le
+service.
 
 ``` bash
-sudo cp dashboard.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable dashboard
-sudo systemctl start dashboard
+sudo ./scripts/linux/install-service.sh
 ```
+
+Le script : arrête un éventuel ancien service `dashboard`, copie l'application
+dans `/opt/raspberrydashboard`, installe le service (exécuté par l'utilisateur
+courant, pointant vers le dossier fixe), l'active au démarrage et le lance. Il
+signale aussi tout autre lancement automatique résiduel (crontab, `rc.local`,
+autostart) à retirer à la main.
+
+> Le nom d'unité reste **`dashboard`** — c'est celui que RaspberryDashboard
+> surveille (`systemctl is-active dashboard`).
+
+### Mettre à jour
+
+``` bash
+sudo ./scripts/linux/update-service.sh
+```
+
+`git pull`, recopie de l'application dans `/opt/raspberrydashboard`, puis
+redémarrage du service.
 
 ## Vérification
 

@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and the project follows [Semantic Versioning](https://semver.org/) (the `VERSION`
 file at the repository root).
 
+## [1.6.0] — 2026-07-15
+
+### Added — robust systemd install
+
+- **`scripts/linux/install-service.sh`** installs the app into a **fixed location**
+  (`/opt/raspberrydashboard`), independent of where the git clone lives. Moving or
+  renaming the repository (or a Syncthing sync) no longer breaks the service. The
+  script stops any previous `dashboard` service, copies the app, installs the unit
+  (running as the current user, pointing at the fixed dir), enables and starts it,
+  and flags any leftover autostart (crontab, `rc.local`, desktop autostart).
+- **`scripts/linux/update-service.sh`**: `git pull`, re-copy to the fixed dir,
+  restart — no compilation (Python).
+- The unit name stays **`dashboard`** (the one the dashboard monitors).
+
+### Changed
+
+- Removed the repository-root `dashboard.service` with its hardcoded path (the
+  source of the fragility). The parametrized unit now lives in `scripts/linux/`.
+
 ## [1.5.0] — 2026-07-14
 
 ### Added — standby (screensaver) mode

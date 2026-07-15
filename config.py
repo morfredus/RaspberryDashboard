@@ -101,8 +101,8 @@ BACKLIGHT_FULL = 100         # niveau (%) en fonctionnement normal
 # rétroéclairage descend à SCREENSAVER_BACKLIGHT. La moindre activité SSH
 # (frappe ou sortie d'une commande) réveille l'écran immédiatement.
 SCREENSAVER_ENABLED = True       # False = dashboard permanent, jamais de veille
-SCREENSAVER_IDLE_SECONDS = 500    # délai d'inactivité SSH avant la veille
-SCREENSAVER_BACKLIGHT = 10       # niveau (%) du rétroéclairage en veille
+SCREENSAVER_IDLE_SECONDS = 60    # délai d'inactivité SSH avant la veille
+SCREENSAVER_BACKLIGHT = 15       # niveau (%) du rétroéclairage en veille
 
 # ---------------------------------------------------------------------
 # Couleurs
@@ -171,26 +171,25 @@ def health_color(value, warning, critical):
 # ---------------------------------------------------------------------
 
 SERVICE_LABELS = {
-    "dashboard": "DashBoard",           # service systemd local (systemctl is-active)
-    "homeserverhub": "HomeServerHub",   # service systemd local (homeserverhub is-active)
-#    "gatewaylab": "GatewayLab",         # ESP32 (sonde reseau, voir NETWORK_SERVICES)
-#    "meteohub": "MeteoHub",             # ESP32 (sonde reseau, voir NETWORK_SERVICES)
+    "dashboard": "DashBoard",      # service systemd local (systemctl is-active)
+    "gatewaylab": "GatewayLab",    # ESP32 (sonde reseau, voir NETWORK_SERVICES)
+    "meteohub": "MeteoHub",        # ESP32 (sonde reseau, voir NETWORK_SERVICES)
 }
 
 # Services surveillés par sonde réseau plutôt que par systemd.
 # MeteoHub tourne sur un ESP32 : on ne peut pas l'interroger avec
 # « systemctl », on teste donc l'accès à son serveur web.
 NETWORK_SERVICES = {
-#    "gatewaylab": {
-#        "host": "gatewaylab.local",  # nom mDNS ou IP fixe de l'ESP32
-#        "port": 80,
-#        "timeout": 1.0,            # secondes ; borne le temps d'attente si hors ligne
-#    },
-#    "meteohub": {
-#       "host": "meteohub.local",  # nom mDNS ou IP fixe de l'ESP32
-#        "port": 80,
-#        "timeout": 1.0,            # secondes ; borne le temps d'attente si hors ligne
-#    },
+    "gatewaylab": {
+        "host": "gatewaylab.local",  # nom mDNS ou IP fixe de l'ESP32
+        "port": 80,
+        "timeout": 1.0,            # secondes ; borne le temps d'attente si hors ligne
+    },
+    "meteohub": {
+        "host": "meteohub.local",  # nom mDNS ou IP fixe de l'ESP32
+        "port": 80,
+        "timeout": 1.0,            # secondes ; borne le temps d'attente si hors ligne
+    },
 }
 
 # Délai de grâce avant la première sonde réseau (secondes d'uptime système).
@@ -219,8 +218,8 @@ BEACON_OFFLINE_AFTER = 60
 # POUR AJOUTER UN FUTUR PROJET : ajouter une ligne ici, rien d'autre a modifier.
 # (Le libelle est tronque a l'affichage s'il est trop long -> le garder court.)
 BEACON_APPS = {
-    #"ComponentHub": "ComponentHub",
-    #"SiteWatch":    "SiteWatch",
+    "ComponentHub": "ComponentHub",
+    "SiteWatch":    "SiteWatch",
     # "GatewayLab": "GatewayLab",
     # "MonOutil":   "Mon outil",
 }

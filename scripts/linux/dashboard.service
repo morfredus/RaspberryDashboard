@@ -1,0 +1,28 @@
+# Service systemd pour RaspberryDashboard.
+#
+# L'application est INSTALLÉE dans un dossier fixe (par défaut /opt/raspberrydashboard),
+# indépendant de l'endroit où vit le clone git : déplacer/renommer le dépôt (ou
+# une synchro Syncthing) ne casse plus le service. install-service.sh remplace
+# __RUN_USER__ et __APP_DIR__.
+#
+# Le nom d'unité reste « dashboard » : RaspberryDashboard surveille ce service
+# par ce nom (systemctl is-active dashboard).
+
+[Unit]
+Description=RaspberryDashboard
+After=local-fs.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=__RUN_USER__
+Group=__RUN_USER__
+WorkingDirectory=__APP_DIR__
+ExecStart=/usr/bin/python3 __APP_DIR__/dashboard.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
