@@ -76,7 +76,7 @@ fi
 for f in "/home/$RUN_USER/.config/autostart/"*dashboard* "/home/$RUN_USER/.config/autostart/"*Dashboard*; do
     [[ -e "$f" ]] && { echo "  ⚠ autostart bureau : $f — à retirer"; FOUND=1; }
 done
-[[ "$FOUND" -eq 0 ]] && echo "  Aucun autre lancement automatique détecté. Le service 'dashboard' a remplacé l'ancien."
+[[ "$FOUND" -eq 0 ]] && echo "  Aucun autre lancement automatique détecté. Le service 'morfdashboard' a remplacé l'ancien."
 
 echo
 sleep 1
