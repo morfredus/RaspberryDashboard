@@ -11,7 +11,7 @@
 
 set -euo pipefail
 
-SERVICE_NAME="dashboard"
+SERVICE_NAME="morfdashboard"
 UNIT_DEST="/etc/systemd/system/$SERVICE_NAME.service"
 APP_DIR="${RD_APP_DIR:-/opt/raspberrydashboard}"
 

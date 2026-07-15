@@ -32,14 +32,14 @@ service.
 sudo ./scripts/linux/install-service.sh
 ```
 
-Le script : arrête un éventuel ancien service `dashboard`, copie l'application
-dans `/opt/raspberrydashboard`, installe le service (exécuté par l'utilisateur
-courant, pointant vers le dossier fixe), l'active au démarrage et le lance. Il
-signale aussi tout autre lancement automatique résiduel (crontab, `rc.local`,
-autostart) à retirer à la main.
+Le script : arrête le service `morfdashboard` s'il tourne déjà, copie
+l'application dans `/opt/raspberrydashboard`, installe le service (exécuté par
+l'utilisateur courant, pointant vers le dossier fixe), l'active au démarrage et
+le lance. Il signale aussi tout autre lancement automatique résiduel (crontab,
+`rc.local`, autostart) à retirer à la main.
 
-> Le nom d'unité reste **`dashboard`** — c'est celui que RaspberryDashboard
-> surveille (`systemctl is-active dashboard`).
+> Le nom d'unité est **`morfdashboard`** — c'est celui que RaspberryDashboard
+> surveille (`config.py` → `systemctl is-active morfdashboard`).
 
 ### Mettre à jour
 
@@ -53,7 +53,7 @@ redémarrage du service.
 ## Vérification
 
 ``` bash
-systemctl status dashboard --no-pager
+systemctl status morfdashboard --no-pager
 ```
 
 Le service doit être **active (running)**.
@@ -61,13 +61,13 @@ Le service doit être **active (running)**.
 ## Journaux
 
 ``` bash
-journalctl -u dashboard -n 50 --no-pager
+journalctl -u morfdashboard -n 50 --no-pager
 ```
 
 ou
 
 ``` bash
-journalctl -u dashboard -f
+journalctl -u morfdashboard -f
 ```
 
 ## Gestion du service
@@ -75,19 +75,19 @@ journalctl -u dashboard -f
 Arrêter :
 
 ``` bash
-sudo systemctl stop dashboard
+sudo systemctl stop morfdashboard
 ```
 
 Redémarrer :
 
 ``` bash
-sudo systemctl restart dashboard
+sudo systemctl restart morfdashboard
 ```
 
 Désactiver le démarrage automatique :
 
 ``` bash
-sudo systemctl disable dashboard
+sudo systemctl disable morfdashboard
 ```
 
 ## Commande d'acquittement du badge reboot
@@ -140,21 +140,16 @@ reboot-ack
 
 ## Mise à jour
 
-Après une mise à jour du code :
+Utiliser le script (récupère le code, recopie dans `/opt/raspberrydashboard`,
+redémarre le service) :
 
 ``` bash
-cd ~/Codage/Python/RaspberryDashboard
-git pull
-sudo systemctl restart dashboard
+sudo ./scripts/linux/update-service.sh
 ```
 
-Si `dashboard.service` a été modifié :
-
-``` bash
-sudo cp dashboard.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl restart dashboard
-```
+> Un simple `git pull` ne suffit pas : l'application s'exécute depuis
+> `/opt/raspberrydashboard`, pas depuis le dépôt. La recopie est indispensable —
+> c'est ce que fait `update-service.sh`.
 
 ## Vérification finale
 

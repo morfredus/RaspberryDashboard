@@ -13,7 +13,7 @@
 
 set -euo pipefail
 
-SERVICE_NAME="dashboard"
+SERVICE_NAME="morfdashboard"
 UNIT_DEST="/etc/systemd/system/$SERVICE_NAME.service"
 APP_DIR="${RD_APP_DIR:-/opt/raspberrydashboard}"
 
@@ -57,7 +57,7 @@ echo "Application copiée dans $APP_DIR"
 
 # --- 3. Installer et démarrer le service ---------------------------------
 sed -e "s/__RUN_USER__/$RUN_USER/g" -e "s#__APP_DIR__#$APP_DIR#g" \
-    "$SCRIPT_DIR/dashboard.service" > "$UNIT_DEST"
+    "$SCRIPT_DIR/morfdashboard.service" > "$UNIT_DEST"
 chmod 0644 "$UNIT_DEST"
 systemctl daemon-reload
 systemctl enable --now "$SERVICE_NAME"

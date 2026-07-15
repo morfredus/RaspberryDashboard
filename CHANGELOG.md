@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and the project follows [Semantic Versioning](https://semver.org/) (the `VERSION`
 file at the repository root).
 
+## [1.6.1] — 2026-07-15
+
+### Changed — systemd unit renamed to `morfdashboard`
+
+- The systemd service is now named **`morfdashboard`** (was `dashboard`), for
+  ecosystem consistency. Updated: the unit file (`scripts/linux/morfdashboard.service`),
+  the install/update scripts, the monitored-service key in `config.py`
+  (`SERVICE_LABELS`) and its exclusion in `systeminfo.py` (so the dashboard keeps
+  showing its own status correctly), and `docs/fr/INSTALL.md`.
+- The **old `dashboard` service must be removed manually** before/after
+  installing the new one (see chat / project notes).
+
 ## [1.6.0] — 2026-07-15
 
 ### Added — robust systemd install

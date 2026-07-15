@@ -171,8 +171,8 @@ def health_color(value, warning, critical):
 # ---------------------------------------------------------------------
 
 SERVICE_LABELS = {
-    "dashboard": "DashBoard",      # service systemd local (systemctl is-active)
-    "homeserverhub": "HomeServerHub",    # service systemd local (systemctl is-active)
+    "morfdashboard": "DashBoard",  # service systemd local (systemctl is-active)
+    "morfsync": "SyncroData",      # service systemd local (systemctl is-active)
     #"meteohub": "MeteoHub",        # ESP32 (sonde reseau, voir NETWORK_SERVICES)
 }
 

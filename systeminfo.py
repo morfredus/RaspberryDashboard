@@ -274,7 +274,7 @@ def _services_color(services):
     Le service « Dashboard » lui-même est exclu : il tourne forcément puisque
     c'est lui qui affiche l'écran, donc son état n'apporte rien.
     """
-    dashboard_label = SERVICE_LABELS.get("dashboard")
+    dashboard_label = SERVICE_LABELS.get("morfdashboard")
     relevant = [s for s in services if s.get("label") != dashboard_label]
     if all(s.get("color") == GREEN for s in relevant):
         return GREEN
