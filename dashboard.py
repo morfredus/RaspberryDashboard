@@ -12,6 +12,7 @@ from screensaver import ScreenSaver
 from screen import Display
 from systeminfo import get_system_info, screensaver_status
 from activity import last_terminal_activity
+from presence_sensor import presence_detected
 from beacon_listener import start as start_beacon
 from config import (
     UPDATE_INTERVAL,
@@ -19,6 +20,7 @@ from config import (
     SCREENSAVER_IDLE_SECONDS,
     SCREENSAVER_BACKLIGHT,
     BACKLIGHT_FULL,
+    PRESENCE_SENSOR_ENABLED,
 )
 
 
@@ -62,6 +64,13 @@ def main():
             activity_ts = last_terminal_activity()
             if activity_ts > last_active:
                 last_active = activity_ts
+
+            # Source de reveil SUPPLEMENTAIRE : le capteur de presence (LD2410C)
+            # expose par le service morfSensor. Une presence detectee compte
+            # comme une activite -> l'ecran se rallume. Non bloquant, tolerant a
+            # l'absence du service (voir presence_sensor.py).
+            if PRESENCE_SENSOR_ENABLED and presence_detected():
+                last_active = time.time()
 
             idle = time.time() - last_active
 

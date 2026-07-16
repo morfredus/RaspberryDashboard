@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and the project follows [Semantic Versioning](https://semver.org/) (the `VERSION`
 file at the repository root).
 
+## [1.7.0] — 2026-07-16
+
+### Added — presence sensor as an extra wake source (morfSensor)
+
+- The screen can now be woken by a **presence sensor** (LD2410C radar, etc.)
+  **in addition to** SSH activity. The dashboard does **not** drive any sensor:
+  it queries the autonomous **morfSensor** service over HTTP and reads the
+  `present` boolean.
+- New module **`presence_sensor.py`** — `presence_detected()` does a short,
+  non-blocking `GET` on morfSensor's `/presence`; any error (service down,
+  timeout) returns `False`, so the historical SSH-only behaviour is preserved.
+- **`config.py`** — new `PRESENCE_SENSOR_ENABLED`, `PRESENCE_SENSOR_URL`
+  (`http://127.0.0.1:8788/presence`), `PRESENCE_SENSOR_TIMEOUT`.
+- **`dashboard.py`** — in the main loop, a detected presence refreshes
+  `last_active` just like SSH activity.
+- morfSensor also announces itself via morfBeacon, so `beacon_status.py`
+  discovers it with no configuration.
+
 ## [1.6.1] — 2026-07-15
 
 ### Changed — systemd unit renamed to `morfdashboard`
