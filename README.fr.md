@@ -128,6 +128,30 @@ ligne `Uptime`. Réglages dans `config.py` (`REBOOT_ALERT_*`) ; acquittement san
 supprimer les logs via `python3 reboot_ack.py`. Détails :
 [docs/fr/INSTALL.md](docs/fr/INSTALL.md).
 
+### Alertes e-mail via morfNotify
+
+Le dashboard peut envoyer une notification à `morfNotify` quand une vraie alerte
+persiste : métrique au seuil critique pendant `ALERT_MIN_DURATION_SECONDS`,
+service/application hors ligne pendant `ALERT_SERVICE_MIN_DURATION_SECONDS`, ou
+reboot non demandé détecté. Ce n'est pas déclenché par un simple passage bref au
+rouge.
+
+``` python
+ALERT_NOTIFY_ENABLED = True
+ALERT_NOTIFY_URL = "http://127.0.0.1:8789/notify"
+ALERT_NOTIFY_TARGETS = ["email"]
+ALERT_MIN_DURATION_SECONDS = 5 * 60
+ALERT_SERVICE_MIN_DURATION_SECONDS = 2 * 60
+ALERT_REPEAT_COOLDOWN_SECONDS = 6 * 60 * 60
+```
+
+Le canal est choisi côté configuration : `["email"]`, `["telegram"]` ou
+`["email", "telegram"]` selon les destinations activées dans `morfNotify`.
+
+L'intégration est volontairement faible : si `morfNotify` est absent,
+injoignable ou mal configuré, le dashboard ignore l'échec et continue à afficher
+l'état local normalement.
+
 ### Version
 
 Le numéro affiché dans le bandeau est lu dans le fichier `VERSION` à la racine.
