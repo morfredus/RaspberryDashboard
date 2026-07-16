@@ -14,6 +14,7 @@ from systeminfo import get_system_info, screensaver_status
 from activity import last_terminal_activity
 from presence_sensor import presence_detected
 from beacon_listener import start as start_beacon
+from alert_notifier import AlertNotifier
 from config import (
     UPDATE_INTERVAL,
     SCREENSAVER_ENABLED,
@@ -29,6 +30,7 @@ def main():
     lcd = Display()
     ui = DashboardDisplay()
     saver = ScreenSaver()
+    alerts = AlertNotifier()
 
     # Evite de renvoyer la meme consigne de luminosite a chaque tour de boucle :
     # on ne pilote le retroeclairage que lorsque le niveau change reellement.
@@ -58,6 +60,7 @@ def main():
         while True:
 
             info = get_system_info()
+            alerts.process(info)
 
             # Tout mtime de pseudo-terminal plus recent que notre dernier releve
             # = quelqu'un travaille en SSH -> le systeme est actif maintenant.

@@ -121,6 +121,31 @@ PRESENCE_SENSOR_URL = "http://127.0.0.1:8788/presence"     # endpoint /presence 
 PRESENCE_SENSOR_TIMEOUT = 0.5                              # s ; borne le temps d'attente HTTP
 
 # ---------------------------------------------------------------------
+# Alertes importantes via morfNotify
+# ---------------------------------------------------------------------
+# Le dashboard reste autonome : il POSTe vers morfNotify si disponible, avec
+# timeout court et erreurs ignorees. morfNotify distribue ensuite vers la
+# destination configuree (par defaut "email"). Une alerte n'est envoyee que si
+# l'etat critique dure assez longtemps, ou si un service reste defaillant.
+
+ALERT_NOTIFY_ENABLED = True
+ALERT_NOTIFY_URL = "http://127.0.0.1:8789/notify"
+ALERT_NOTIFY_TARGETS = ["email"]
+ALERT_NOTIFY_TIMEOUT = 1.0
+
+# Metriques critiques : attendre avant de prevenir pour eviter les pics brefs.
+ALERT_MIN_DURATION_SECONDS = 5 * 60
+
+# Services/applications hors ligne : alerte plus rapide, mais pas instantanee.
+ALERT_SERVICE_MIN_DURATION_SECONDS = 2 * 60
+
+# Rappel si le probleme persiste longtemps.
+ALERT_REPEAT_COOLDOWN_SECONDS = 6 * 60 * 60
+
+# Envoie un message de retour a la normale apres une alerte deja envoyee.
+ALERT_RECOVERY_NOTIFY = True
+
+# ---------------------------------------------------------------------
 # Couleurs
 # ---------------------------------------------------------------------
 
