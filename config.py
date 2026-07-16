@@ -214,9 +214,10 @@ def health_color(value, warning, critical):
 # ---------------------------------------------------------------------
 
 SERVICE_LABELS = {
-    "morfdashboard": "DashBoard",  # service systemd local (systemctl is-active)
-    "morfsync": "morfSync",        # service systemd local (Syncronisation de données)
-    "morfsensor": "morfSensor",    # service systemd local (Ecoute de capteurs)
+    "morfdashboard": "DashBoard",   # service systemd local (systemctl is-active)
+    "morfsync": "morfSync",         # service systemd local (Synchro donnees)
+    "morfsensor": "morfSensor",     # service systemd local (Ecoute capteurs)
+    "morfnotify": "morfNotify",     # service systemd local (Notifications)
 }
 
 # Services surveillés par sonde réseau plutôt que par systemd.
