@@ -16,6 +16,8 @@ set -euo pipefail
 SERVICE_NAME="morfdashboard"
 UNIT_DEST="/etc/systemd/system/$SERVICE_NAME.service"
 APP_DIR="${RD_APP_DIR:-/opt/morfdashboard}"
+CONFIG_DIR="${RD_CONFIG_DIR:-/etc/morfdashboard}"
+CONFIG_FILE="$CONFIG_DIR/config.local.py"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
@@ -39,6 +41,7 @@ fi
 echo "Utilisateur  : $RUN_USER"
 echo "Source       : $REPO_ROOT"
 echo "Installation : $APP_DIR"
+echo "Config locale: $CONFIG_FILE"
 
 # --- 1. Arrêter l'ancien lancement ---------------------------------------
 systemctl stop "$SERVICE_NAME" 2>/dev/null || true
@@ -47,15 +50,25 @@ systemctl stop "$SERVICE_NAME" 2>/dev/null || true
 mkdir -p "$APP_DIR"
 if command -v rsync >/dev/null; then
     rsync -a --exclude='.git' --exclude='__pycache__' --exclude='*.pyc' \
-             --exclude='*_preview.png' "$REPO_ROOT"/ "$APP_DIR"/
+             --exclude='*_preview.png' --exclude='config.local.py' \
+             "$REPO_ROOT"/ "$APP_DIR"/
 else
     cp -a "$REPO_ROOT"/. "$APP_DIR"/
-    rm -rf "$APP_DIR/.git" "$APP_DIR"/**/__pycache__ 2>/dev/null || true
+    rm -rf "$APP_DIR/.git" "$APP_DIR"/**/__pycache__ "$APP_DIR/config.local.py" 2>/dev/null || true
 fi
 chown -R "$RUN_USER:$RUN_USER" "$APP_DIR"
 echo "Application copiée dans $APP_DIR"
 
-# --- 3. Installer et démarrer le service ---------------------------------
+# --- 3. Installer/preserver la configuration locale ----------------------
+mkdir -p "$CONFIG_DIR"
+if [[ ! -f "$CONFIG_FILE" ]]; then
+    install -m 0644 "$REPO_ROOT/config.local.example.py" "$CONFIG_FILE"
+    echo "Config initiale copiée : $CONFIG_FILE (à adapter si besoin)."
+else
+    echo "Config existante conservée : $CONFIG_FILE"
+fi
+
+# --- 4. Installer et démarrer le service ---------------------------------
 sed -e "s/__RUN_USER__/$RUN_USER/g" -e "s#__APP_DIR__#$APP_DIR#g" \
     "$SCRIPT_DIR/morfdashboard.service" > "$UNIT_DEST"
 chmod 0644 "$UNIT_DEST"
@@ -63,7 +76,7 @@ systemctl daemon-reload
 systemctl enable --now "$SERVICE_NAME"
 echo "Service '$SERVICE_NAME' installé (ExecStart -> $APP_DIR/dashboard.py) et démarré."
 
-# --- 4. Détecter d'autres démarrages automatiques (à nettoyer à la main) --
+# --- 5. Détecter d'autres démarrages automatiques (à nettoyer à la main) --
 echo
 echo "Vérification d'anciens lancements résiduels…"
 FOUND=0

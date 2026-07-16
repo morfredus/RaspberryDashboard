@@ -38,6 +38,12 @@ l'utilisateur courant, pointant vers le dossier fixe), l'active au démarrage et
 le lance. Il signale aussi tout autre lancement automatique résiduel (crontab,
 `rc.local`, autostart) à retirer à la main.
 
+La configuration locale est séparée du code installé :
+`/etc/morfdashboard/config.local.py`. Le script la crée depuis
+`config.local.example.py` si elle n'existe pas encore, puis la conserve lors des
+installations et mises à jour suivantes. Modifier ce fichier pour choisir les
+canaux de notification, les services surveillés ou désactiver une option locale.
+
 > Le nom d'unité est **`morfdashboard`** — c'est celui que RaspberryDashboard
 > surveille (`config.py` → `systemctl is-active morfdashboard`).
 
@@ -47,8 +53,10 @@ le lance. Il signale aussi tout autre lancement automatique résiduel (crontab,
 sudo ./scripts/linux/update-service.sh
 ```
 
-`git pull`, recopie de l'application dans `/opt/morfdashboard`, puis
-redémarrage du service.
+Le script arrête d'abord `morfdashboard`, lance `git pull`, recopie
+l'application dans `/opt/morfdashboard`, préserve
+`/etc/morfdashboard/config.local.py`, rafraîchit l'unité systemd puis redémarre
+le service s'il tournait avant la mise à jour.
 
 ## Vérification
 
@@ -109,11 +117,13 @@ n'accède **pas** au capteur : il interroge le service autonome **morfSensor**
 3. Tester le lien sans le service graphique :
    ```bash
    python3 presence_sensor.py     # "Présence détectée…" ou "Aucune présence…"
-   ```
+```
 
 Si morfSensor est absent ou injoignable, la détection est simplement ignorée :
 le réveil par activité SSH continue de fonctionner. Mettre
 `PRESENCE_SENSOR_ENABLED = False` pour désactiver complètement l'interrogation.
+Pour une installation en service, préférer cette surcharge dans
+`/etc/morfdashboard/config.local.py` afin qu'une mise à jour ne l'écrase pas.
 
 ## Commande d'acquittement du badge reboot
 
@@ -165,8 +175,8 @@ reboot-ack
 
 ## Mise à jour
 
-Utiliser le script (récupère le code, recopie dans `/opt/morfdashboard`,
-redémarre le service) :
+Utiliser le script (arrête le service, récupère le code, recopie dans
+`/opt/morfdashboard`, conserve la config locale, redémarre le service) :
 
 ``` bash
 sudo ./scripts/linux/update-service.sh

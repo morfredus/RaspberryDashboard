@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and the project follows [Semantic Versioning](https://semver.org/) (the `VERSION`
 file at the repository root).
 
+## [0.7.2] — 2026-07-17
+
+### Changed — robust service config and update flow
+
+- `config.py` now loads optional local overrides from
+  `MORFDASHBOARD_CONFIG`, `/etc/morfdashboard/config.local.py`, then
+  `config.local.py` next to the app. Only uppercase settings are imported.
+- `install-service.sh` creates/preserves `/etc/morfdashboard/config.local.py`,
+  excludes local config from the application copy, installs the systemd unit,
+  enables it at boot and starts it immediately.
+- `update-service.sh` now stops `morfdashboard` before updating, preserves the
+  local config, refreshes the systemd unit, then restarts the service only if it
+  was running before the update.
+- Added `config.local.example.py` as the template for local overrides.
+
 ## [1.7.0] — 2026-07-16
 
 ### Added — presence sensor as an extra wake source (morfSensor)
