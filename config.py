@@ -105,6 +105,22 @@ SCREENSAVER_IDLE_SECONDS = 60    # délai d'inactivité SSH avant la veille
 SCREENSAVER_BACKLIGHT = 15       # niveau (%) du rétroéclairage en veille
 
 # ---------------------------------------------------------------------
+# Détection de présence par capteur (service morfSensor)
+# ---------------------------------------------------------------------
+# Source de réveil SUPPLÉMENTAIRE à l'activité SSH : un capteur de présence
+# (radar LD2410C, etc.) géré par le service autonome « morfSensor ». Le dashboard
+# ne pilote PAS le capteur : il interroge l'API HTTP de morfSensor à l'URL
+# ci-dessous et lit le champ booléen « present ». Une présence détectée réveille
+# l'écran comme le ferait une frappe SSH (voir presence_sensor.py + dashboard.py).
+#
+# morfSensor tourne en local sur le Raspberry (service systemd « morfsensor »).
+# Si le service est absent ou injoignable, la détection est simplement ignorée :
+# le comportement historique (réveil SSH seul) reste intact.
+PRESENCE_SENSOR_ENABLED = True                              # False = ignorer le capteur
+PRESENCE_SENSOR_URL = "http://127.0.0.1:8788/presence"     # endpoint /presence de morfSensor
+PRESENCE_SENSOR_TIMEOUT = 0.5                              # s ; borne le temps d'attente HTTP
+
+# ---------------------------------------------------------------------
 # Couleurs
 # ---------------------------------------------------------------------
 
@@ -173,7 +189,7 @@ def health_color(value, warning, critical):
 SERVICE_LABELS = {
     "morfdashboard": "DashBoard",  # service systemd local (systemctl is-active)
     "morfsync": "SyncroData",      # service systemd local (systemctl is-active)
-    #"meteohub": "MeteoHub",        # ESP32 (sonde reseau, voir NETWORK_SERVICES)
+    "morfsensor": "Capteurs",        # ESP32 (sonde reseau, voir NETWORK_SERVICES)
 }
 
 # Services surveillés par sonde réseau plutôt que par systemd.

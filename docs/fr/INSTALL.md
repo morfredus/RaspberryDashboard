@@ -90,6 +90,31 @@ Désactiver le démarrage automatique :
 sudo systemctl disable morfdashboard
 ```
 
+## Détection de présence par capteur (optionnel — morfSensor)
+
+En plus du réveil par activité SSH, le dashboard peut rallumer l'écran quand un
+**capteur de présence** (radar LD2410C, etc.) détecte quelqu'un. Le dashboard
+n'accède **pas** au capteur : il interroge le service autonome **morfSensor**
+(projet séparé) via HTTP.
+
+1. Installer et lancer morfSensor sur le Raspberry (voir son dépôt :
+   `scripts/linux/install-service.sh`, service systemd `morfsensor`, API sur le
+   port 8788).
+2. Dans `config.py` du dashboard, régler le bloc **Détection de présence** :
+   ```python
+   PRESENCE_SENSOR_ENABLED = True
+   PRESENCE_SENSOR_URL = "http://127.0.0.1:8788/presence"
+   PRESENCE_SENSOR_TIMEOUT = 0.5
+   ```
+3. Tester le lien sans le service graphique :
+   ```bash
+   python3 presence_sensor.py     # "Présence détectée…" ou "Aucune présence…"
+   ```
+
+Si morfSensor est absent ou injoignable, la détection est simplement ignorée :
+le réveil par activité SSH continue de fonctionner. Mettre
+`PRESENCE_SENSOR_ENABLED = False` pour désactiver complètement l'interrogation.
+
 ## Commande d'acquittement du badge reboot
 
 Le script `reboot_ack.py` permet d'acquitter le badge `REBOOT!` sans supprimer
