@@ -8,6 +8,7 @@
 # Usage :
 #   sudo ./scripts/linux/update-service.sh          # git pull + recopie + restart
 #   sudo ./scripts/linux/update-service.sh --no-pull # recopie seulement
+#   sudo ./scripts/linux/update-service.sh --refresh-config # sauvegarde + remplace la config locale
 
 set -euo pipefail
 
@@ -20,6 +21,15 @@ CONFIG_FILE="$CONFIG_DIR/config.local.py"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 RUN_USER="${SUDO_USER:-$(logname 2>/dev/null || echo root)}"
+NO_PULL=0
+REFRESH_CONFIG=0
+
+for arg in "$@"; do
+    case "$arg" in
+        --no-pull) NO_PULL=1 ;;
+        --refresh-config) REFRESH_CONFIG=1 ;;
+    esac
+done
 
 if [[ "${EUID}" -ne 0 ]]; then
     echo "Ce script doit être lancé avec sudo :  sudo $0 $*" >&2
@@ -40,7 +50,7 @@ echo "Arrêt de $SERVICE_NAME avant mise à jour…"
 systemctl stop "$SERVICE_NAME" 2>/dev/null || true
 
 # --- Récupérer le code (en tant que l'utilisateur) -----------------------
-if [[ "${1:-}" != "--no-pull" ]]; then
+if [[ "$NO_PULL" -ne 1 ]]; then
     echo "git pull (utilisateur $RUN_USER)…"
     sudo -u "$RUN_USER" bash -c "cd '$REPO_ROOT' && git pull --ff-only"
 fi
@@ -59,7 +69,12 @@ chown -R "$RUN_USER:$RUN_USER" "$APP_DIR"
 
 # --- Installer la config locale si elle n'existe pas encore --------------
 mkdir -p "$CONFIG_DIR"
-if [[ ! -f "$CONFIG_FILE" ]]; then
+if [[ "$REFRESH_CONFIG" -eq 1 && -f "$CONFIG_FILE" ]]; then
+    BACKUP="$CONFIG_FILE.$(date +%Y%m%d-%H%M%S).bak"
+    cp -a "$CONFIG_FILE" "$BACKUP"
+    install -m 0644 "$REPO_ROOT/config.local.example.py" "$CONFIG_FILE"
+    echo "Config locale remplacée : $CONFIG_FILE (sauvegarde : $BACKUP)."
+elif [[ ! -f "$CONFIG_FILE" ]]; then
     install -m 0644 "$REPO_ROOT/config.local.example.py" "$CONFIG_FILE"
     echo "Config initiale copiée : $CONFIG_FILE (à adapter si besoin)."
 else

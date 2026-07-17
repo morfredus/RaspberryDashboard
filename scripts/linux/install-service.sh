@@ -9,6 +9,7 @@
 # Usage :
 #   sudo ./scripts/linux/install-service.sh
 #   sudo RD_APP_DIR=/opt/rdash ./scripts/linux/install-service.sh   # autre dossier
+#   sudo ./scripts/linux/install-service.sh --refresh-config         # sauvegarde + remplace la config locale
 #   sudo ./scripts/linux/install-service.sh --uninstall
 
 set -euo pipefail
@@ -22,6 +23,13 @@ CONFIG_FILE="$CONFIG_DIR/config.local.py"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 RUN_USER="${SUDO_USER:-$(logname 2>/dev/null || echo root)}"
+REFRESH_CONFIG=0
+
+for arg in "$@"; do
+    case "$arg" in
+        --refresh-config) REFRESH_CONFIG=1 ;;
+    esac
+done
 
 if [[ "${EUID}" -ne 0 ]]; then
     echo "Ce script doit être lancé avec sudo :  sudo $0 $*" >&2
@@ -61,7 +69,12 @@ echo "Application copiée dans $APP_DIR"
 
 # --- 3. Installer/preserver la configuration locale ----------------------
 mkdir -p "$CONFIG_DIR"
-if [[ ! -f "$CONFIG_FILE" ]]; then
+if [[ "$REFRESH_CONFIG" -eq 1 && -f "$CONFIG_FILE" ]]; then
+    BACKUP="$CONFIG_FILE.$(date +%Y%m%d-%H%M%S).bak"
+    cp -a "$CONFIG_FILE" "$BACKUP"
+    install -m 0644 "$REPO_ROOT/config.local.example.py" "$CONFIG_FILE"
+    echo "Config locale remplacée : $CONFIG_FILE (sauvegarde : $BACKUP)."
+elif [[ ! -f "$CONFIG_FILE" ]]; then
     install -m 0644 "$REPO_ROOT/config.local.example.py" "$CONFIG_FILE"
     echo "Config initiale copiée : $CONFIG_FILE (à adapter si besoin)."
 else
