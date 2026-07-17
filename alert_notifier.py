@@ -9,6 +9,7 @@ Si morfNotify est absent ou lent, l'erreur est ignoree.
 import json
 import threading
 import time
+import urllib.error
 import urllib.request
 
 from config import (
@@ -56,6 +57,11 @@ class AlertNotifier:
             cooldown_done = now - state["sent_at"] >= ALERT_REPEAT_COOLDOWN_SECONDS
 
             if duration >= min_duration and (not state["active"] or cooldown_done):
+                print(
+                    f"[alerts] envoi alerte '{alert['summary']}' "
+                    f"vers {ALERT_NOTIFY_TARGETS}",
+                    flush=True,
+                )
                 self._send(alert["title"], alert["message"], alert["level"])
                 state["sent_at"] = now
                 state["active"] = True
@@ -133,6 +139,7 @@ class AlertNotifier:
 
     def _send(self, title, message, level):
         if not ALERT_NOTIFY_TARGETS:
+            print("[alerts] aucune destination configuree (ALERT_NOTIFY_TARGETS vide)", flush=True)
             return
 
         payload = {
@@ -153,7 +160,14 @@ class AlertNotifier:
                 headers={"Content-Type": "application/json"},
                 method="POST",
             )
-            with urllib.request.urlopen(req, timeout=ALERT_NOTIFY_TIMEOUT):
-                pass
-        except Exception:
-            pass
+            with urllib.request.urlopen(req, timeout=ALERT_NOTIFY_TIMEOUT) as response:
+                response_body = response.read().decode("utf-8", errors="replace")
+                print(
+                    f"[alerts] morfNotify HTTP {response.status}: {response_body}",
+                    flush=True,
+                )
+        except urllib.error.HTTPError as exc:
+            error_body = exc.read().decode("utf-8", errors="replace")
+            print(f"[alerts] echec morfNotify HTTP {exc.code}: {error_body}", flush=True)
+        except Exception as exc:
+            print(f"[alerts] echec appel morfNotify: {exc}", flush=True)
