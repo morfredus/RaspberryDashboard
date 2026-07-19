@@ -4,7 +4,6 @@
 # Configuration WiFi et secrets embarqués (spécifique ESP32/PlatformIO)
 include/secrets.h
 include/wifi-config.h
-config.local.py
 
 # Fichier de configuration locale (contient mots de passe, jetons, chemins)
 config.json

@@ -23,4 +23,5 @@ SERVICE_LABELS = {
     "morfsync": "morfSync",
     "morfsensor": "morfSensor",
     "morfnotify": "morfNotify",
+    "morfanalytics": "morfAnalytics",
 }
