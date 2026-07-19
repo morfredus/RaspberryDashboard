@@ -217,6 +217,8 @@ SERVICE_LABELS = {
     "morfdashboard": "DashBoard",  # service systemd local (systemctl is-active)
     "morfsync": "morfSync",        # service systemd local (Syncronisation de données)
     "morfsensor": "morfSensor",    # service systemd local (Ecoute de capteurs)
+    "morfnotify": "morfNotify",  # service systemd local (Notifications)
+    "morfanalytics": "morfAnalytics",  # service systemd local (Analyse de données)
 }
 
 # Services surveillés par sonde réseau plutôt que par systemd.
@@ -286,7 +288,17 @@ def _load_local_config():
             print(f"Configuration locale ignoree ({path}) : {exc}")
             return
         for key, value in values.items():
-            if key.isupper():
+            if not key.isupper():
+                continue
+
+            # Les listes de services sont extensibles localement : une ancienne
+            # config locale ne doit pas masquer les services ajoutés au défaut
+            # lors d'une mise à jour. Une clé locale existante garde néanmoins
+            # la priorité, pour permettre de personnaliser son libellé/sa sonde.
+            default = globals().get(key)
+            if isinstance(default, dict) and isinstance(value, dict):
+                globals()[key] = {**default, **value}
+            else:
                 globals()[key] = value
         return
 

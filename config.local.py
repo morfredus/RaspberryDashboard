@@ -11,11 +11,9 @@ ALERT_NOTIFY_TARGETS = ["telegram"]
 # Exemple : desactiver les notifications sans toucher au code installe.
 # ALERT_NOTIFY_ENABLED = False
 
-# Exemple : adapter les services surveilles.
+# Ajouter seulement les services propres a cette machine. Les dictionnaires
+# locaux sont fusionnés avec ceux de config.py : les services livrés avec le
+# dashboard restent donc visibles après une mise à jour.
 SERVICE_LABELS = {
-    "morfdashboard": "DashBoard", # service systemd local (systemctl is-active)
-    "morfsync": "morfSync",       # service systemd local (Syncronisation de données)
-    "morfsensor": "morfSensor",   # service systemd local (Ecoute de capteurs)
-    "morfnotify": "morfNotify",   # service systemd local (Notifications)
-    "morfanalytics": "morfAnalytics", # service systemd local (Analyse de données)
+# "morfnotify": "morfNotify",  # service systemd local (Notifications)
 }

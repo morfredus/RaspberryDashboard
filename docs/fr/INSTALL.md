@@ -42,7 +42,9 @@ La configuration locale est séparée du code installé :
 `/etc/morfdashboard/config.local.py`. Le script la crée depuis
 `config.local.example.py` si elle n'existe pas encore, puis la conserve lors des
 installations et mises à jour suivantes. Modifier ce fichier pour choisir les
-canaux de notification, les services surveillés ou désactiver une option locale.
+canaux de notification, ajouter des services propres à la machine ou désactiver
+une option locale. Les dictionnaires (dont `SERVICE_LABELS`) sont fusionnés avec
+les valeurs standard : les services ajoutés par une mise à jour restent affichés.
 
 > Le nom d'unité est **`morfdashboard`** — c'est celui que RaspberryDashboard
 > surveille (`config.py` → `systemctl is-active morfdashboard`).

@@ -17,11 +17,9 @@ ALERT_MIN_DURATION_SECONDS = 5 * 60
 ALERT_SERVICE_MIN_DURATION_SECONDS = 2 * 60
 ALERT_REPEAT_COOLDOWN_SECONDS = 6 * 60 * 60
 
-# Services surveilles.
+# Ajouter seulement les services propres a cette machine. Les dictionnaires
+# locaux sont fusionnés avec ceux de config.py : les services livrés avec le
+# dashboard restent donc visibles après une mise à jour.
 SERVICE_LABELS = {
-    "morfdashboard": "DashBoard",
-    "morfsync": "morfSync",
-    "morfsensor": "morfSensor",
-    "morfnotify": "morfNotify",
-    "morfanalytics": "morfAnalytics",
+#    "morfnotify": "morfNotify",
 }
