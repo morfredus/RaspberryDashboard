@@ -8,7 +8,14 @@ file at the repository root).
 
 ## [Non publié]
 
+## [1.7.3] — 2026-07-20
+
 ### Corrigé
+
+- **Numéro de version corrigé de `0.7.2` en `1.7.2`.** La version avait reculé
+  sous une lignée déjà taguée (`v1.4.0`), ce qui aurait produit un tag
+  s'ordonnant avant les releases existantes. `VERSION` et l'en-tête de
+  l'entrée du 17/07/2026 sont alignés.
 
 - **Les services disparaissaient de la partie basse de l'écran.** Ils
   s'affichaient brièvement puis laissaient la place à une liste vide. Le mode
@@ -72,7 +79,7 @@ file at the repository root).
   réseau n'y apparaît que si sa clé figure aussi dans `SERVICE_LABELS`,
   contrainte héritée de l'implémentation d'origine.
 
-## [0.7.2] — 2026-07-17
+## [1.7.2] — 2026-07-17
 
 ### Changed — robust service config and update flow
 
