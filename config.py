@@ -288,8 +288,14 @@ BEACON_APPS = {
 # partielle, machine sans morfMonitor), le Dashboard doit continuer d'afficher
 # quelque chose plutot que de se retrouver sans aucun service a surveiller.
 
+_MORFSYSTEM_DEFAULT_CONFIG = (
+    Path(os.environ.get("ProgramData", r"C:\ProgramData"))
+    / "morfSystem" / "morfsystem.json"
+    if os.name == "nt"
+    else Path("/etc/morfsystem/morfsystem.json")
+)
 MORFSYSTEM_CONFIG = os.environ.get(
-    "MORFSYSTEM_CONFIG", "/etc/morfsystem/morfsystem.json")
+    "MORFSYSTEM_CONFIG", str(_MORFSYSTEM_DEFAULT_CONFIG))
 
 # Acces a morfMonitor. Mettre MONITOR_ENABLED a False force le mode local.
 MONITOR_ENABLED = True
