@@ -5,6 +5,8 @@ from datetime import datetime
 
 import psutil
 
+import monitor_client
+
 from config import (
     PROJECT_DIR,
     SERVICE_LABELS,
@@ -18,6 +20,7 @@ from config import (
     SSD_WARNING, SSD_CRITICAL,
     TEMP_WARNING, TEMP_CRITICAL,
     LOAD_WARNING, LOAD_CRITICAL,
+    MONITOR_ENABLED, MONITOR_URL, MONITOR_TIMEOUT,
     health_color,
 )
 
@@ -141,7 +144,44 @@ def _beacon_color(online: bool, state):
     return GREEN
 
 
-def get_system_info():
+def _service_colors(services_section):
+    """Traduit l'état fourni par morfMonitor en pastilles colorées.
+
+    La couleur relève de la PRÉSENTATION : morfMonitor fournit des faits
+    (actif / inactif / en attente), le Dashboard décide comment les montrer.
+    C'est ce partage qui permet à d'autres interfaces d'afficher les mêmes
+    données autrement, sans que morfMonitor ait à les connaître.
+    """
+    out = []
+    for entry in services_section.get("systemd", []):
+        if not entry.get("enabled", True):
+            continue
+        out.append({
+            "label": entry.get("label", entry.get("unit", "?")),
+            "color": GREEN if entry.get("active") else RED,
+        })
+    for entry in services_section.get("network", []):
+        if not entry.get("enabled", True):
+            continue
+        state = entry.get("state")
+        # « pending » n'est pas « hors ligne » : la sonde attend simplement que
+        # le WiFi se stabilise. L'afficher en rouge serait une fausse alerte.
+        color = GREEN if entry.get("online") else (ORANGE if state == "pending" else RED)
+        out.append({"label": entry.get("label", entry.get("name", "?")), "color": color})
+    for entry in services_section.get("beacon", []):
+        # Les applications entendues mais non déclarées ne sont pas affichées :
+        # l'écran est petit, et la configuration reste la source de vérité de ce
+        # qui mérite une pastille. Elles restent visibles dans l'API.
+        if not entry.get("declared") or not entry.get("enabled", True):
+            continue
+        out.append({
+            "label": entry.get("label", entry.get("app", "?")),
+            "color": GREEN if entry.get("online") else RED,
+        })
+    return out
+
+
+def _get_system_info_local():
 
     disk = shutil.disk_usage("/")
 
@@ -208,6 +248,58 @@ def get_system_info():
 
         "services": services,
     }
+
+
+
+
+def _monitor_answer_is_usable(data):
+    """Une réponse de morfMonitor est-elle exploitable, ou faut-il replier ?
+
+    Répondre n'est pas savoir. Si morfMonitor n'a pas chargé sa configuration
+    (fichier partagé absent au démarrage, par exemple), il répond correctement
+    mais ne supervise RIEN : ni service systemd, ni sonde réseau. L'accepter
+    telle quelle vidait l'écran de ses pastilles — un affichage vide, sans la
+    moindre alerte, alors que la collecte locale aurait très bien fonctionné.
+
+    Une machine réellement dépourvue de composant supervisé n'existe pas en
+    pratique : zéro service est donc le signe d'une réponse dégénérée, pas d'un
+    état normal. On préfère le mode local, qui affiche au moins quelque chose.
+    """
+    services = data.get("services") or {}
+    declared = len(services.get("systemd") or []) + len(services.get("network") or [])
+    return declared > 0
+
+
+def get_system_info():
+    """Informations système, depuis morfMonitor si possible, sinon localement.
+
+    Le repli est AUTOMATIQUE dans les deux sens : si morfMonitor est arrêté, en
+    cours de démarrage, ou injoignable, le Dashboard reprend la collecte locale
+    ; dès que le service répond de nouveau, il redevient la source. Aucun
+    redémarrage du Dashboard n'est nécessaire, ce qui compte : c'est justement
+    pendant un incident qu'on regarde l'écran.
+
+    Le champ « source » permet de savoir d'un coup d'œil d'où viennent les
+    données — indispensable au diagnostic, et discret à l'affichage.
+    """
+    if MONITOR_ENABLED:
+        data = monitor_client.fetch_all(MONITOR_URL, MONITOR_TIMEOUT)
+        if data and _monitor_answer_is_usable(data):
+            info = monitor_client.to_dashboard_shape(data, _service_colors)
+            # Champs qui restent la propriété du Dashboard : sa version, son
+            # horloge d'affichage, et son suivi d'accusé de redémarrage.
+            info["version"] = VERSION
+            info["time"] = datetime.now().strftime("%H:%M:%S")
+            info["cpu_cores"] = psutil.cpu_count() or 1
+            info["reboot_alert"] = get_reboot_alert()
+            info["source"] = "morfMonitor"
+            return info
+
+    info = _get_system_info_local()
+    info["source"] = "local"
+    if MONITOR_ENABLED:
+        info["source_error"] = monitor_client.last_error()
+    return info
 
 
 def overall_status(info):

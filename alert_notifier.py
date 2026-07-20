@@ -32,6 +32,69 @@ from config import (
 )
 
 
+
+# Niveau de notification selon la cause. Une coupure d'alimentation ou un
+# plantage appellent une reaction ; un redemarrage demande ou une mise a jour
+# sont attendus et ne meritent pas le meme cri d'alarme. Envoyer tout au meme
+# niveau, comme auparavant, revenait a n'en signaler aucun utilement.
+_REBOOT_LEVELS = {
+    "power_loss": "error",
+    "kernel_panic": "error",
+    "watchdog": "error",
+    "user_requested": "info",
+    "update": "info",
+    "clean_boot": "info",
+    "unknown": "warning",
+}
+
+# Seuil en dessous duquel la cause est presentee comme une hypothese. La
+# detection est faillible par nature : affirmer « coupure d'alimentation » a
+# tort ferait chercher un probleme electrique inexistant.
+_REBOOT_CONFIDENT = 0.65
+
+
+def _build_reboot_alert(latest, cause_info):
+    """Construit l'alerte de redemarrage, enrichie de sa cause si connue.
+
+    Sans morfMonitor (mode degrade), aucune cause n'est disponible : on retombe
+    sur le message generique d'origine plutot que d'inventer une explication.
+    """
+    if not cause_info or not cause_info.get("label"):
+        return {
+            "title": "RaspberryDashboard",
+            "summary": "reboot non demande detecte",
+            "message": f"Reboot non demande detecte. Rapport : {latest}",
+            "level": "warning",
+            "min_duration": 0,
+        }
+
+    cause = cause_info.get("cause", "unknown")
+    label = cause_info["label"]
+    confidence = float(cause_info.get("confidence") or 0.0)
+    evidence = cause_info.get("evidence") or ""
+
+    # Une cause peu sûre est annoncée comme telle. Mieux vaut un « probablement »
+    # explicite qu'une affirmation fausse qui oriente le diagnostic à côté.
+    # La réserve ne s'applique PAS à « cause inconnue » : le libellé dit déjà
+    # qu'on ne sait pas, et « inconnue (hypothèse peu sûre) » ne veut rien dire.
+    if cause == "unknown" or confidence >= _REBOOT_CONFIDENT:
+        headline = label
+    else:
+        headline = f"{label} (hypothèse peu sûre)"
+
+    message = f"{headline}. Rapport : {latest}"
+    if evidence:
+        message += f" — indice retenu : {evidence}"
+
+    return {
+        "title": "RaspberryDashboard",
+        "summary": f"redemarrage : {cause}",
+        "message": message,
+        "level": _REBOOT_LEVELS.get(cause, "warning"),
+        "min_duration": 0,
+    }
+
+
 class AlertNotifier:
     def __init__(self):
         self._states = {}
@@ -110,13 +173,7 @@ class AlertNotifier:
         reboot_alert = info.get("reboot_alert", {})
         if reboot_alert.get("active"):
             latest = reboot_alert.get("latest") or "rapport inconnu"
-            alerts["reboot"] = {
-                "title": "RaspberryDashboard",
-                "summary": "reboot non demande detecte",
-                "message": f"Reboot non demande detecte. Rapport : {latest}",
-                "level": "warning",
-                "min_duration": 0,
-            }
+            alerts["reboot"] = _build_reboot_alert(latest, info.get("reboot_cause"))
 
         return alerts
 

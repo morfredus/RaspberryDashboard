@@ -6,6 +6,72 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and the project follows [Semantic Versioning](https://semver.org/) (the `VERSION`
 file at the repository root).
 
+## [Non publié]
+
+### Corrigé
+
+- **Les services disparaissaient de la partie basse de l'écran.** Ils
+  s'affichaient brièvement puis laissaient la place à une liste vide. Le mode
+  dégradé ne se déclenchait que si morfMonitor était **injoignable** ; un
+  morfMonitor qui répond mais n'a chargé **aucune configuration** — donc ne
+  supervise rien — passait pour une réponse valide, et l'écran se vidait sans la
+  moindre alerte. Répondre n'est pas savoir : une réponse ne déclarant aucun
+  service systemd ni aucune sonde est désormais jugée dégénérée, et le Dashboard
+  replie sur sa collecte locale. Un superviseur muet est pire qu'un superviseur
+  arrêté, puisque l'arrêt, lui, avait un repli.
+
+### Ajouté
+
+- **Consommation des API de morfMonitor** (`monitor_client.py`). Le Dashboard
+  privilégie désormais morfMonitor comme source des informations système, au
+  lieu de les collecter lui-même. Une seule requête (`/api/all`) fournit un
+  instantané cohérent.
+- **Mode dégradé automatique.** Si morfMonitor est arrêté, en cours de
+  démarrage ou injoignable, le Dashboard reprend sa collecte locale, et revient
+  au mode normal dès que le service répond. **Aucun redémarrage n'est
+  nécessaire** — ce qui compte, puisque c'est pendant un incident qu'on regarde
+  l'écran. Après un échec, le client attend 10 s avant de retenter : marteler un
+  service arrêté ne le rallume pas et figerait l'affichage à chaque tentative.
+- **Champ `source`** dans `get_system_info()` : vaut `morfMonitor` ou `local`,
+  avec `source_error` en mode dégradé. Permet d'afficher discrètement l'origine
+  des données et de diagnostiquer d'un coup d'œil.
+- **Notifications de redémarrage enrichies.** Tous les redémarrages
+  produisaient le même message générique (« Reboot non demandé détecté »), donc
+  inexploitable. La notification envoyée à morfNotify précise désormais la cause
+  fournie par morfMonitor, et son **niveau en découle** : `error` pour une
+  coupure d'alimentation, un plantage noyau ou un chien de garde ; `info` pour
+  un redémarrage demandé ou une mise à jour, qui sont attendus ; `warning` quand
+  la cause reste indéterminée. Tout envoyer au même niveau revenait à n'en
+  signaler aucun utilement.
+
+  La détection étant faillible, une cause de faible confiance est annoncée comme
+  **hypothèse** plutôt qu'affirmée : affirmer « coupure d'alimentation » à tort
+  ferait chercher un problème électrique inexistant. La réserve ne s'applique
+  pas à « cause inconnue », dont le libellé dit déjà qu'on ne sait pas.
+
+  Sans morfMonitor (mode dégradé), aucune cause n'est disponible : le message
+  générique d'origine est conservé, plutôt qu'une explication inventée.
+- **Configuration partagée** `/etc/morfsystem/morfsystem.json`, lue aussi par
+  morfMonitor. `SERVICE_LABELS`, `NETWORK_SERVICES` et `BEACON_APPS` en sont
+  désormais dérivés ; les listes codées dans `config.py` deviennent des valeurs
+  de repli, conservées pour qu'une machine sans fichier partagé continue
+  d'afficher quelque chose.
+
+### Modifié
+
+- L'ancienne collecte locale est conservée intégralement sous
+  `_get_system_info_local()` : elle n'est plus le chemin nominal, mais reste le
+  filet de sécurité. La couleur des pastilles reste au Dashboard — morfMonitor
+  fournit des faits (actif / inactif / en attente), pas des choix graphiques.
+
+### Limitations connues
+
+- L'**indicateur visuel** de source n'est pas encore dessiné à l'écran : la
+  donnée est disponible, son affichage reste à faire.
+- Le mode local affiche **8 pastilles contre 9** en mode normal : une sonde
+  réseau n'y apparaît que si sa clé figure aussi dans `SERVICE_LABELS`,
+  contrainte héritée de l'implémentation d'origine.
+
 ## [0.7.2] — 2026-07-17
 
 ### Changed — robust service config and update flow

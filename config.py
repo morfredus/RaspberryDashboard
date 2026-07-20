@@ -1,3 +1,4 @@
+import json
 import os
 import runpy
 from pathlib import Path
@@ -268,6 +269,87 @@ BEACON_APPS = {
     # "GatewayLab": "GatewayLab",
     # "MonOutil":   "Mon outil",
 }
+
+
+# ---------------------------------------------------------------------
+# Configuration PARTAGEE avec morfMonitor
+# ---------------------------------------------------------------------
+# Les listes ci-dessus (SERVICE_LABELS, NETWORK_SERVICES, BEACON_APPS) sont
+# desormais des VALEURS DE REPLI. La source de verite est le fichier partage
+# /etc/morfsystem/morfsystem.json, lu aussi bien par morfMonitor (C++) que par
+# ce Dashboard (Python).
+#
+# Pourquoi : tant que chaque programme portait sa propre liste, ajouter un
+# service demandait de modifier du code a deux endroits, avec la certitude
+# qu'ils finiraient par diverger. Desormais, ajouter un composant ne demande
+# QUE d'editer ce fichier.
+#
+# Le repli reste indispensable : si le fichier partage est absent (installation
+# partielle, machine sans morfMonitor), le Dashboard doit continuer d'afficher
+# quelque chose plutot que de se retrouver sans aucun service a surveiller.
+
+MORFSYSTEM_CONFIG = os.environ.get(
+    "MORFSYSTEM_CONFIG", "/etc/morfsystem/morfsystem.json")
+
+# Acces a morfMonitor. Mettre MONITOR_ENABLED a False force le mode local.
+MONITOR_ENABLED = True
+MONITOR_URL = "http://127.0.0.1:8790"
+MONITOR_TIMEOUT = 1.5
+
+
+def _load_shared_config():
+    """Remplace les listes locales par celles du fichier partage, s'il existe."""
+    global SERVICE_LABELS, NETWORK_SERVICES, BEACON_APPS
+    global BEACON_PORT, BEACON_OFFLINE_AFTER, NETWORK_PROBE_GRACE
+
+    path = Path(MORFSYSTEM_CONFIG)
+    if not path.is_file():
+        return False
+    try:
+        with path.open(encoding="utf-8") as handle:
+            data = json.load(handle)
+    except (OSError, ValueError) as exc:
+        print(f"Configuration partagee ignoree ({path}) : {exc}")
+        return False
+
+    services = data.get("systemd_services")
+    if isinstance(services, list):
+        SERVICE_LABELS = {
+            entry["unit"]: entry.get("label", entry["unit"])
+            for entry in services
+            if entry.get("unit") and entry.get("enabled", True)
+        }
+
+    network = data.get("network_services")
+    if isinstance(network, list):
+        NETWORK_SERVICES = {
+            entry["name"]: {
+                "host": entry.get("host", ""),
+                "port": entry.get("port", 80),
+                # Le fichier partage exprime les delais en millisecondes ; le
+                # Dashboard raisonne en secondes.
+                "timeout": entry.get("timeout_ms", 1000) / 1000.0,
+            }
+            for entry in network
+            if entry.get("name") and entry.get("enabled", True)
+        }
+
+    apps = data.get("beacon_apps")
+    if isinstance(apps, list):
+        BEACON_APPS = {
+            entry["app"]: entry.get("label", entry["app"])
+            for entry in apps
+            if entry.get("app") and entry.get("enabled", True)
+        }
+
+    beacon = data.get("beacon") or {}
+    BEACON_PORT = beacon.get("port", BEACON_PORT)
+    BEACON_OFFLINE_AFTER = beacon.get("offline_after_s", BEACON_OFFLINE_AFTER)
+    NETWORK_PROBE_GRACE = data.get("network_probe_grace_s", NETWORK_PROBE_GRACE)
+    return True
+
+
+SHARED_CONFIG_LOADED = _load_shared_config()
 
 
 def _load_local_config():
