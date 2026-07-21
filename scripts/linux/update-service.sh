@@ -14,7 +14,9 @@ set -euo pipefail
 
 SERVICE_NAME="morfdashboard"
 UNIT_DEST="/etc/systemd/system/$SERVICE_NAME.service"
-APP_DIR="${RD_APP_DIR:-/opt/morfdashboard}"
+# MORF_APP_DIR : variable unique du parc. RD_APP_DIR reste reconnu
+# pour ne pas casser une note ou un script anterieur.
+APP_DIR="${MORF_APP_DIR:-${RD_APP_DIR:-/opt/morfdashboard}}"
 CONFIG_DIR="${RD_CONFIG_DIR:-/etc/morfdashboard}"
 CONFIG_FILE="$CONFIG_DIR/config.local.py"
 

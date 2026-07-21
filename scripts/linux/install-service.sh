@@ -3,12 +3,12 @@
 # install-service.sh — Installe RaspberryDashboard en service systemd robuste.
 #
 # Copie l'application dans un dossier FIXE (par défaut /opt/morfdashboard),
-# hors du clone git, puis installe/active le service « dashboard » pointant là.
+# hors du clone git, puis installe/active le service « morfdashboard » pointant là.
 # Ainsi, déplacer le dépôt (ou une synchro Syncthing) ne casse plus rien.
 #
 # Usage :
 #   sudo ./scripts/linux/install-service.sh
-#   sudo RD_APP_DIR=/opt/rdash ./scripts/linux/install-service.sh   # autre dossier
+#   sudo MORF_APP_DIR=/opt/rdash ./scripts/linux/install-service.sh   # autre dossier
 #   sudo ./scripts/linux/install-service.sh --refresh-config         # sauvegarde + remplace la config locale
 #   sudo ./scripts/linux/install-service.sh --uninstall
 
@@ -16,7 +16,9 @@ set -euo pipefail
 
 SERVICE_NAME="morfdashboard"
 UNIT_DEST="/etc/systemd/system/$SERVICE_NAME.service"
-APP_DIR="${RD_APP_DIR:-/opt/morfdashboard}"
+# MORF_APP_DIR : variable unique du parc. RD_APP_DIR reste reconnu
+# pour ne pas casser une note ou un script anterieur.
+APP_DIR="${MORF_APP_DIR:-${RD_APP_DIR:-/opt/morfdashboard}}"
 CONFIG_DIR="${RD_CONFIG_DIR:-/etc/morfdashboard}"
 CONFIG_FILE="$CONFIG_DIR/config.local.py"
 
@@ -53,6 +55,19 @@ echo "Config locale: $CONFIG_FILE"
 
 # --- 1. Arrêter l'ancien lancement ---------------------------------------
 systemctl stop "$SERVICE_NAME" 2>/dev/null || true
+
+# Avant la 1.6.1, ce service s'appelait « dashboard ». Une unité de ce nom est
+# encore installée et ACTIVE sur toute machine mise à jour depuis cette époque.
+# L'étape 5 traquait le crontab et l'autostart, mais pas l'ancienne UNITÉ elle-
+# même — la plus probable : sans ce nettoyage, dashboard.service et
+# morfdashboard.service piloteraient tous deux le même écran OLED.
+LEGACY_UNIT="/etc/systemd/system/dashboard.service"
+if [[ -f "$LEGACY_UNIT" ]]; then
+    echo "Ancien service 'dashboard' détecté : désactivation (remplacé par 'morfdashboard')."
+    systemctl disable --now dashboard 2>/dev/null || true
+    rm -f "$LEGACY_UNIT"
+    systemctl daemon-reload
+fi
 
 # --- 2. Copier l'application dans le dossier fixe -------------------------
 mkdir -p "$APP_DIR"

@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and the project follows [Semantic Versioning](https://semver.org/) (the `VERSION`
 file at the repository root).
 
+## [1.8.1] — 2026-07-22
+
+### Corrigé
+
+- **L'installation retire l'ancien service `dashboard`.** Le renommage en
+  `morfdashboard` datait de la 1.6.1, mais rien ne désinstallait l'unité
+  d'origine : sur une machine mise à jour depuis, `dashboard.service` et
+  `morfdashboard.service` pilotaient tous deux le même écran OLED. L'étape 5
+  vérifiait le crontab et l'autostart, jamais l'ancienne unité systemd, la plus
+  probable.
+
+- **`MORF_APP_DIR` remplace `RD_APP_DIR`**, la variable unique du parc.
+  L'ancienne reste reconnue pour ne casser aucune note ni aucun script.
+
 ## [Non publié]
 
 ## [1.7.3] — 2026-07-20

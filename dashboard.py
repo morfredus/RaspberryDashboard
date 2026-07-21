@@ -10,10 +10,11 @@ from boot import BootScreen
 from display import DashboardDisplay
 from screensaver import ScreenSaver
 from screen import Display
-from systeminfo import get_system_info, screensaver_status
+from systeminfo import get_system_info, screensaver_status, VERSION
 from activity import last_terminal_activity
 from presence_sensor import presence_detected
 from beacon_listener import start as start_beacon
+import beacon_emitter
 from alert_notifier import AlertNotifier
 from config import (
     UPDATE_INTERVAL,
@@ -22,6 +23,9 @@ from config import (
     SCREENSAVER_BACKLIGHT,
     BACKLIGHT_FULL,
     PRESENCE_SENSOR_ENABLED,
+    BEACON_PORT,
+    BEACON_ANNOUNCE,
+    BEACON_STATUS_PORT,
 )
 
 
@@ -45,6 +49,12 @@ def main():
     # Ecoute des heartbeats morfBeacon (ComponentHub, SiteWatch, futurs outils)
     # en tache de fond, des le demarrage : la presence est prete des le 1er rendu.
     start_beacon()
+
+    # Le dashboard s'annonce a son tour : il etait le seul service du parc a
+    # n'exister que comme consommateur, donc invisible dans l'Ecosysteme de
+    # morfMonitor. Emetteur + /status minimal, non bloquant.
+    if BEACON_ANNOUNCE:
+        beacon_emitter.start(VERSION, BEACON_STATUS_PORT, BEACON_PORT)
 
     try:
         # Animation de démarrage

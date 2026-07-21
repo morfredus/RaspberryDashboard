@@ -259,6 +259,13 @@ BEACON_PORT = 45454
 # Delai sans heartbeat avant de declarer une application hors ligne (secondes).
 BEACON_OFFLINE_AFTER = 60
 
+# Le dashboard s'annonce lui-meme (protocole morfbeacon/1) et sert un /status
+# minimal sur ce port. Attribue par le registre d'adressage du parc :
+# 'ports.allocations' dans morfTools/ecosystem.json. Voisin de morfMonitor
+# (8790), avec qui il forme une paire : l'un collecte, l'autre affiche.
+BEACON_ANNOUNCE = True
+BEACON_STATUS_PORT = 8791
+
 # Applications a surveiller : cle = nom annonce dans le heartbeat (champ "app"),
 # valeur = libelle affiche a l'ecran.
 # POUR AJOUTER UN FUTUR PROJET : ajouter une ligne ici, rien d'autre a modifier.
