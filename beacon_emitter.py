@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 beacon_emitter.py
 Annonce la presence du dashboard sur le reseau local (protocole morfbeacon/1) et
