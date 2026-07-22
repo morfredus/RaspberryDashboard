@@ -1,4 +1,4 @@
-# RaspberryDashboard
+# morfDashboard
 
 *Lire dans une autre langue : [English](README.md) · **Français** (ce document).*
 
@@ -59,7 +59,7 @@ Voir [docs/fr/INSTALL.md](docs/fr/INSTALL.md) pour l'installation en service
 Test rapide, sans installer le service :
 
 ``` bash
-cd ~/Codage/Python/RaspberryDashboard
+cd ~/Codage/Python/morfDashboard
 python3 dashboard.py
 ```
 

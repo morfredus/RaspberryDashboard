@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# install-service.sh — Installe RaspberryDashboard en service systemd robuste.
+# install-service.sh — Installe morfDashboard en service systemd robuste.
 #
 # Copie l'application dans un dossier FIXE (par défaut /opt/morfdashboard),
 # hors du clone git, puis installe/active le service « morfdashboard » pointant là.
@@ -108,10 +108,10 @@ echo "Service '$SERVICE_NAME' installé (ExecStart -> $APP_DIR/dashboard.py) et 
 echo
 echo "Vérification d'anciens lancements résiduels…"
 FOUND=0
-if crontab -u "$RUN_USER" -l 2>/dev/null | grep -iqE "dashboard|RaspberryDashboard"; then
+if crontab -u "$RUN_USER" -l 2>/dev/null | grep -iqE "dashboard|morfDashboard"; then
     echo "  ⚠ crontab de $RUN_USER contient une entrée dashboard — à retirer :  crontab -u $RUN_USER -e"; FOUND=1
 fi
-if [[ -f /etc/rc.local ]] && grep -iqE "dashboard|RaspberryDashboard" /etc/rc.local; then
+if [[ -f /etc/rc.local ]] && grep -iqE "dashboard|morfDashboard" /etc/rc.local; then
     echo "  ⚠ /etc/rc.local référence dashboard — à retirer manuellement"; FOUND=1
 fi
 for f in "/home/$RUN_USER/.config/autostart/"*dashboard* "/home/$RUN_USER/.config/autostart/"*Dashboard*; do

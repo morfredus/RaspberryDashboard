@@ -1,6 +1,6 @@
-# Documentation de RaspberryDashboard (français)
+# Documentation de morfDashboard (français)
 
-Bienvenue dans la documentation de **RaspberryDashboard**, le tableau de bord
+Bienvenue dans la documentation de **morfDashboard**, le tableau de bord
 système pour Raspberry Pi affiché sur un petit écran SPI (ILI9341 / ST7789).
 
 > 🇬🇧 English documentation: [`docs/en/`](../en/README.md) *(index, in progress)*.

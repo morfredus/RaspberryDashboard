@@ -1,8 +1,8 @@
 # INSTALL.md
 
-# RaspberryDashboard - Installation
+# morfDashboard - Installation
 
-Ce document décrit la mise en place de RaspberryDashboard en tant que
+Ce document décrit la mise en place de morfDashboard en tant que
 service systemd afin qu'il démarre automatiquement au démarrage du
 Raspberry Pi.
 
@@ -46,7 +46,7 @@ canaux de notification, ajouter des services propres à la machine ou désactive
 une option locale. Les dictionnaires (dont `SERVICE_LABELS`) sont fusionnés avec
 les valeurs standard : les services ajoutés par une mise à jour restent affichés.
 
-> Le nom d'unité est **`morfdashboard`** — c'est celui que RaspberryDashboard
+> Le nom d'unité est **`morfdashboard`** — c'est celui que morfDashboard
 > surveille (`config.py` → `systemctl is-active morfdashboard`).
 
 ### Mettre à jour
@@ -134,7 +134,7 @@ les dossiers de logs. Il peut être lancé directement depuis le dossier du
 dashboard :
 
 ``` bash
-cd ~/Codage/Python/RaspberryDashboard
+cd ~/Codage/Python/morfDashboard
 python3 reboot_ack.py
 ```
 
@@ -150,11 +150,11 @@ Contenu du fichier `~/bin/reboot-ack` :
 
 ``` sh
 #!/bin/sh
-cd /home/morfredus/Codage/Python/RaspberryDashboard || exit 1
+cd /home/morfredus/Codage/Python/morfDashboard || exit 1
 exec python3 reboot_ack.py "$@"
 ```
 
-Adapter le chemin `/home/morfredus/Codage/Python/RaspberryDashboard` si le
+Adapter le chemin `/home/morfredus/Codage/Python/morfDashboard` si le
 projet est installé ailleurs.
 
 Rendre le lanceur exécutable :

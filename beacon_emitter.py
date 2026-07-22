@@ -27,10 +27,9 @@ import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-# Le nom ANNONCE sur le reseau, coherent avec le reste du parc (morfSync,
-# morfMonitor...) et avec l'unite systemd « morfdashboard ». Le depot garde son
-# nom historique RaspberryDashboard ; c'est l'identite reseau qui compte ici,
-# et morfMonitor affiche ce nom tel qu'il est annonce.
+# Le nom ANNONCE sur le reseau, aligne avec le reste du parc : le projet, le
+# depot, l'unite systemd « morfdashboard » et ce nom disent tous morfDashboard.
+# morfMonitor affiche ce nom tel qu'il est annonce.
 APP_NAME = "morfDashboard"
 PROTO = "morfbeacon/1"
 

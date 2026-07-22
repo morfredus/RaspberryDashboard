@@ -1,4 +1,4 @@
-# RaspberryDashboard
+# morfDashboard
 
 *Read in another language: **English** (this document) · [Français](README.fr.md).*
 
@@ -58,7 +58,7 @@ service (auto-start at boot).
 Quick test, without installing the service:
 
 ``` bash
-cd ~/Codage/Python/RaspberryDashboard
+cd ~/Codage/Python/morfDashboard
 python3 dashboard.py
 ```
 

@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and the project follows [Semantic Versioning](https://semver.org/) (the `VERSION`
 file at the repository root).
 
+## [1.9.0] — 2026-07-22
+
+### Modifié
+
+- **Le projet est renommé RaspberryDashboard → morfDashboard**, pour une cohérence
+  totale avec le reste du parc (morfMonitor, morfSync…) et avec ce que le service
+  fait déjà : l'unité systemd `morfdashboard` et le nom annoncé sur le réseau
+  `morfDashboard` étaient déjà alignés. Le dépôt GitHub, le dossier, la
+  documentation et les références du parc suivent. Aucun changement de
+  comportement : mêmes fichiers, même service, même port 8791.
+
 ## [1.8.1] — 2026-07-22
 
 ### Corrigé

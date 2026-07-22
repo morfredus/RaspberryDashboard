@@ -1,15 +1,15 @@
-# Service systemd pour RaspberryDashboard.
+# Service systemd pour morfDashboard.
 #
 # L'application est INSTALLÉE dans un dossier fixe (par défaut /opt/morfdashboard),
 # indépendant de l'endroit où vit le clone git : déplacer/renommer le dépôt (ou
 # une synchro Syncthing) ne casse plus le service. install-service.sh remplace
 # __RUN_USER__ et __APP_DIR__.
 #
-# Nom d'unité : « morfdashboard ». RaspberryDashboard surveille ce service par ce
+# Nom d'unité : « morfdashboard ». morfDashboard surveille ce service par ce
 # nom (SERVICE_LABELS dans config.py -> systemctl is-active morfdashboard).
 
 [Unit]
-Description=RaspberryDashboard
+Description=morfDashboard
 After=local-fs.target network-online.target
 Wants=network-online.target
 

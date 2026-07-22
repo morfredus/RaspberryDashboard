@@ -1,4 +1,4 @@
-# Configuration locale RaspberryDashboard.
+# Configuration locale morfDashboard.
 #
 # Copier vers /etc/morfdashboard/config.local.py puis adapter. Seules les
 # constantes a surcharger sont necessaires ici ; config.py fournit les defauts.

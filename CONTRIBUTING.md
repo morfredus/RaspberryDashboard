@@ -1,4 +1,4 @@
-# Contributing to RaspberryDashboard
+# Contributing to morfDashboard
 
 Thanks for your interest! This is a small, focused project: a headless system
 dashboard for the Raspberry Pi on a tiny SPI screen. Contributions that keep it

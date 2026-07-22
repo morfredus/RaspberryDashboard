@@ -1,6 +1,6 @@
 # Documentation (English index)
 
-The in-depth documentation of RaspberryDashboard is currently **available in
+The in-depth documentation of morfDashboard is currently **available in
 French only**. Translations are welcome — see
 [CONTRIBUTING.md](../../CONTRIBUTING.md).
 

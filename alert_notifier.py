@@ -61,7 +61,7 @@ def _build_reboot_alert(latest, cause_info):
     """
     if not cause_info or not cause_info.get("label"):
         return {
-            "title": "RaspberryDashboard",
+            "title": "morfDashboard",
             "summary": "reboot non demande detecte",
             "message": f"Reboot non demande detecte. Rapport : {latest}",
             "level": "warning",
@@ -87,7 +87,7 @@ def _build_reboot_alert(latest, cause_info):
         message += f" — indice retenu : {evidence}"
 
     return {
-        "title": "RaspberryDashboard",
+        "title": "morfDashboard",
         "summary": f"redemarrage : {cause}",
         "message": message,
         "level": _REBOOT_LEVELS.get(cause, "warning"),
@@ -136,7 +136,7 @@ class AlertNotifier:
             state = self._states.pop(key)
             if ALERT_RECOVERY_NOTIFY and state.get("active"):
                 self._send(
-                    "RaspberryDashboard",
+                    "morfDashboard",
                     f"Retour a la normale : {state.get('summary', key)}",
                     "success",
                 )
@@ -163,7 +163,7 @@ class AlertNotifier:
                 key = f"service:{label}"
                 summary = f"{label} defaillant"
                 alerts[key] = {
-                    "title": "RaspberryDashboard",
+                    "title": "morfDashboard",
                     "summary": summary,
                     "message": f"Alerte persistante : {summary}. Le service ou l'application reste hors ligne.",
                     "level": "error",
@@ -184,7 +184,7 @@ class AlertNotifier:
         display_value = f"{value:.1f}{unit}" if isinstance(value, float) else f"{value}{unit}"
         summary = f"{label} critique ({display_value})"
         alerts[f"metric:{key}"] = {
-            "title": "RaspberryDashboard",
+            "title": "morfDashboard",
             "summary": summary,
             "message": (
                 f"Alerte persistante : {summary}. "

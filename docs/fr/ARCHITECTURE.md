@@ -1,6 +1,6 @@
 # ARCHITECTURE
 
-    RaspberryDashboard/
+    morfDashboard/
     ├── assets/
     │   ├── fonts/            (DejaVu Sans Mono)
     │   └── logo.png
