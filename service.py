@@ -102,6 +102,10 @@ def main(argv: list | None = None) -> int:
         help="Ce qu'il faut faire",
     )
     parser.add_argument(
+        "--force", action="store_true",
+        help="update : redeployer et redemarrer meme si rien n'a change",
+    )
+    parser.add_argument(
         "--purge", action="store_true",
         help="uninstall : non supporte par ce projet, signale et ignore",
     )
@@ -151,7 +155,10 @@ def main(argv: list | None = None) -> int:
         # --no-pull : recuperer le code est le travail de morf.py, deployer est
         # le notre. C'est le meme partage que pour les services morfdeploy, dont
         # l'`update` ne fait jamais de git pull non plus.
-        return run_script("update-service.sh", ["--no-pull"])
+        opts = ["--no-pull"]
+        if args.force:
+            opts.append("--force")
+        return run_script("update-service.sh", opts)
 
     # uninstall
     if args.purge or args.backup:
