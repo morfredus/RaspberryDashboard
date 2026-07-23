@@ -26,10 +26,13 @@ RUN_USER="${SUDO_USER:-$(logname 2>/dev/null || echo root)}"
 NO_PULL=0
 REFRESH_CONFIG=0
 
+FORCE=0
+
 for arg in "$@"; do
     case "$arg" in
         --no-pull) NO_PULL=1 ;;
         --refresh-config) REFRESH_CONFIG=1 ;;
+        --force) FORCE=1 ;;
     esac
 done
 
@@ -42,6 +45,37 @@ if [[ ! -f "$UNIT_DEST" ]]; then
     exit 1
 fi
 
+# --- Récupérer le code (en tant que l'utilisateur) -----------------------
+# Avant l'arrêt : récupérer le code ne demande pas que le service soit stoppé,
+# et il faut disposer du code final pour savoir s'il y a seulement quelque
+# chose à déployer.
+if [[ "$NO_PULL" -ne 1 ]]; then
+    echo "git pull (utilisateur $RUN_USER)…"
+    sudo -u "$RUN_USER" bash -c "cd '$REPO_ROOT' && git pull --ff-only"
+fi
+
+# --- Y a-t-il seulement quelque chose à faire ? --------------------------
+# Arrêter le service, recopier des fichiers identiques et le redémarrer n'est
+# pas neutre : c'est une coupure de supervision et un uptime remis à zéro, payés
+# au moment précis où l'on croyait ne rien toucher. rsync sait dire, à blanc, ce
+# qu'il changerait ; s'il ne changerait rien et que la configuration est en
+# place, il n'y a pas de mise à jour à faire.
+#
+# Sans rsync, la détection est impossible et on déploie comme avant : mieux vaut
+# un redémarrage inutile qu'une mise à jour silencieusement omise.
+if [[ "$FORCE" -ne 1 && "$REFRESH_CONFIG" -ne 1 ]] && command -v rsync >/dev/null; then
+    PENDING="$(rsync -a --itemize-changes --dry-run \
+        --exclude='.git' --exclude='__pycache__' --exclude='*.pyc' \
+        --exclude='*_preview.png' --exclude='config.local.py' \
+        "$REPO_ROOT"/ "$APP_DIR"/ 2>/dev/null || echo "indetermine")"
+    if [[ -z "$PENDING" && -f "$CONFIG_FILE" ]]; then
+        echo "morfDashboard est déjà à jour : aucun fichier à recopier, configuration en place."
+        echo "Rien n'a été déployé, le service n'a PAS été redémarré."
+        echo "Utiliser --force pour redéployer et redémarrer malgré tout."
+        exit 0
+    fi
+fi
+
 SERVICE_WAS_ACTIVE=0
 if systemctl is-active --quiet "$SERVICE_NAME"; then
     SERVICE_WAS_ACTIVE=1
@@ -50,12 +84,6 @@ fi
 # --- Arreter avant toute mise a jour ------------------------------------
 echo "Arrêt de $SERVICE_NAME avant mise à jour…"
 systemctl stop "$SERVICE_NAME" 2>/dev/null || true
-
-# --- Récupérer le code (en tant que l'utilisateur) -----------------------
-if [[ "$NO_PULL" -ne 1 ]]; then
-    echo "git pull (utilisateur $RUN_USER)…"
-    sudo -u "$RUN_USER" bash -c "cd '$REPO_ROOT' && git pull --ff-only"
-fi
 
 # --- Recopier l'application ----------------------------------------------
 echo "Recopie vers $APP_DIR…"

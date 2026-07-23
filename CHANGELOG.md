@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and the project follows [Semantic Versioning](https://semver.org/) (the `VERSION`
 file at the repository root).
 
+## [1.10.1] — 2026-07-24
+
+### Corrigé
+
+- **Une mise à jour sans changement ne redémarre plus le service.** Le script
+  arrêtait, recopiait puis relançait sans jamais se demander s'il y avait
+  quelque chose à déployer. `rsync` sait pourtant dire, à blanc, ce qu'il
+  changerait : quand il ne changerait rien et que la configuration est en place,
+  la mise à jour s'arrête en le disant — et en précisant que le service n'a
+  **pas** été redémarré. `--force` passe outre. Sans `rsync`, on déploie comme
+  avant : mieux vaut un redémarrage inutile qu'une mise à jour silencieusement
+  omise. Le `git pull` passe avant l'arrêt, puisqu'il n'a jamais eu besoin que
+  le service soit stoppé — et qu'il faut le code final pour savoir s'il y a
+  quelque chose à faire.
+
 ## [1.10.0] — 2026-07-24
 
 ### Ajouté
