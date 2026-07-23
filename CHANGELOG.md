@@ -6,6 +6,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and the project follows [Semantic Versioning](https://semver.org/) (the `VERSION`
 file at the repository root).
 
+## [1.10.0] — 2026-07-24
+
+### Ajouté
+
+- **`service.py` — morfDashboard expose enfin l'interface commune du parc**
+  (`install`, `update`, `uninstall`, `status`, `is-installed`). Il restait le
+  seul service piloté par ses scripts shell, et ce cas particulier avait un
+  coût invisible : `morf.py upgrade` récupérait son nouveau code puis laissait
+  le service tourner sur l'ancien, **sans un mot**, faute d'un `service.py` à
+  interroger. morfTools peut désormais s'en tenir à une règle sans exception :
+  un projet qui est un service porte un `service.py`.
+
+  Ce fichier ne réimplémente rien — il traduit une interface. Le déploiement
+  reste entièrement dans `scripts/linux/`, qui connaît le rsync, ses exclusions,
+  la configuration locale et l'unité systemd : la connaissance du projet reste
+  dans le projet. `update` délègue avec `--no-pull`, parce que récupérer le code
+  est le travail de morfTools et déployer celui du projet — le même partage que
+  pour les services morfdeploy, dont l'`update` ne fait pas de `git pull` non
+  plus.
+
+  `is-installed` répond par son code de retour (0 installé, 1 absent) en
+  interrogeant systemd, pas en testant la présence d'un fichier : c'est le
+  gestionnaire de services qui fait autorité. Sur une machine qui n'est pas sous
+  Linux, la réponse est « absent » et les autres actions expliquent pourquoi.
+
 ## [1.9.0] — 2026-07-22
 
 ### Modifié
