@@ -43,15 +43,15 @@ LINUX_SCRIPTS = HERE / "scripts" / "linux"
 #: repondrait « pas installe » pour un service qui tourne.
 SERVICE_NAME = "morfdashboard"
 
-#: morfDashboard pilote un ecran OLED sur un Raspberry Pi et s'installe en unite
-#: systemd : il n'y a pas de version Windows a installer, et le dire vaut mieux
-#: que lancer bash sur une machine qui n'en a pas.
+#: morfDashboard pilote un ecran SPI (ILI9341 / ST7789) sur un Raspberry Pi et
+#: s'installe en unite systemd : il n'y a pas de version Windows a installer, et
+#: le dire vaut mieux que lancer bash sur une machine qui n'en a pas.
 SUPPORTED = "Linux"
 
 
 def unsupported_note() -> str:
     return (
-        f"morfDashboard s'installe sous {SUPPORTED} (unite systemd, ecran OLED "
+        f"morfDashboard s'installe sous {SUPPORTED} (unite systemd, ecran SPI "
         f"d'un Raspberry Pi).\nCette machine est sous {platform.system()} : rien "
         "a installer ici."
     )

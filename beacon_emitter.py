@@ -5,7 +5,7 @@ sert un /status minimal.
 
 Le dashboard etait le seul service du parc a n'exister que comme CONSOMMATEUR :
 il ecoute les beacons des autres (beacon_listener.py) et affiche leur etat sur
-l'ecran OLED, mais ne s'annoncait pas lui-meme. Il restait donc invisible dans
+l'ecran SPI, mais ne s'annoncait pas lui-meme. Il restait donc invisible dans
 l'onglet Ecosysteme de morfMonitor -- jamais en panne, jamais decouvert.
 
 Deux briques, parce que le protocole l'exige : « push presence, pull detail ».

@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and the project follows [Semantic Versioning](https://semver.org/) (the `VERSION`
 file at the repository root).
 
+## [1.10.2] — 2026-07-24
+
+### Corrigé
+
+- **L'écran n'est pas un OLED.** Plusieurs commentaires et une entrée de journal
+  décrivaient « l'écran OLED » du dashboard, alors qu'il pilote une dalle **LCD
+  SPI (ILI9341 / ST7789)** — ce que le README dit par ailleurs explicitement en
+  rappelant que le burn-in est « essentiellement un phénomène OLED », donc sans
+  objet ici. Corrigé dans `service.py`, `beacon_emitter.py`,
+  `scripts/linux/install-service.sh` et l'entrée de la 1.8.0. Les deux mentions
+  d'OLED du README et du journal qui parlent du burn-in sont, elles, exactes et
+  conservées.
+
 ## [1.10.1] — 2026-07-24
 
 ### Corrigé
@@ -64,7 +77,7 @@ file at the repository root).
 - **L'installation retire l'ancien service `dashboard`.** Le renommage en
   `morfdashboard` datait de la 1.6.1, mais rien ne désinstallait l'unité
   d'origine : sur une machine mise à jour depuis, `dashboard.service` et
-  `morfdashboard.service` pilotaient tous deux le même écran OLED. L'étape 5
+  `morfdashboard.service` pilotaient tous deux le même écran SPI. L'étape 5
   vérifiait le crontab et l'autostart, jamais l'ancienne unité systemd, la plus
   probable.
 

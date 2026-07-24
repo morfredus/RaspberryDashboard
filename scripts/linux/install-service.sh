@@ -60,7 +60,7 @@ systemctl stop "$SERVICE_NAME" 2>/dev/null || true
 # encore installée et ACTIVE sur toute machine mise à jour depuis cette époque.
 # L'étape 5 traquait le crontab et l'autostart, mais pas l'ancienne UNITÉ elle-
 # même — la plus probable : sans ce nettoyage, dashboard.service et
-# morfdashboard.service piloteraient tous deux le même écran OLED.
+# morfdashboard.service piloteraient tous deux le même écran SPI.
 LEGACY_UNIT="/etc/systemd/system/dashboard.service"
 if [[ -f "$LEGACY_UNIT" ]]; then
     echo "Ancien service 'dashboard' détecté : désactivation (remplacé par 'morfdashboard')."
